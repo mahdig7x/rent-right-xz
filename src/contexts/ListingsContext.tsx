@@ -9,6 +9,8 @@ export interface ListingItem {
   category: string;
   price_per_day: number;
   location: string;
+  latitude?: number | null;
+  longitude?: number | null;
   condition: 'new' | 'like_new' | 'good' | 'fair';
   status: 'available' | 'booked' | 'unavailable';
   moderation_status: 'approved' | 'pending_review' | 'flagged' | 'suspended';
