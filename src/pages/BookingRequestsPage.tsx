@@ -24,12 +24,12 @@ export default function BookingRequestsPage() {
       const renterIds = [...new Set(bookingsData.map((b: any) => b.renter_id))];
       let profilesMap: Record<string, string> = {};
       if (renterIds.length > 0) {
-        const { data: profs } = await supabase
-          .from('profiles')
+        const { data: profs } = await (supabase as any)
+          .from('profiles_public')
           .select('user_id, name')
           .in('user_id', renterIds);
         if (profs) {
-          profilesMap = profs.reduce((acc, p) => { acc[p.user_id] = p.name; return acc; }, {} as Record<string, string>);
+          profilesMap = profs.reduce((acc: any, p: any) => { acc[p.user_id] = p.name; return acc; }, {} as Record<string, string>);
         }
       }
       setRequests(bookingsData.map((b: any) => ({ ...b, renter: { name: profilesMap[b.renter_id] || 'مستخدم' } })));

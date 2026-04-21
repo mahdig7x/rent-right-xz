@@ -168,7 +168,7 @@ export default function ItemDetailsPage() {
       const { data: rs } = await supabase.from('reviews').select('*').in('booking_id', ids).order('created_at', { ascending: false });
       if (!rs) { setReviews([]); return; }
       const reviewerIds = [...new Set(rs.map((r: any) => r.reviewer_id))];
-      const { data: profs } = await supabase.from('profiles').select('user_id, name, profile_image').in('user_id', reviewerIds);
+      const { data: profs } = await (supabase as any).from('profiles_public').select('user_id, name, profile_image').in('user_id', reviewerIds);
       const pmap = (profs || []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
       setReviews(rs.map((r: any) => ({
         id: r.id,
