@@ -80,6 +80,20 @@ export default function MessagesPage() {
     return () => clearInterval(interval);
   }, [selectedUserId, selectedBookingId, loadMessages]);
 
+  const [otherUserFallback, setOtherUserFallback] = useState<{ name: string; image: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!selectedUserId || convo) { setOtherUserFallback(null); return; }
+    (async () => {
+      const { data } = await (supabase as any)
+        .from('profiles_public')
+        .select('name, profile_image')
+        .eq('user_id', selectedUserId)
+        .maybeSingle();
+      if (data) setOtherUserFallback({ name: data.name || 'User', image: data.profile_image });
+    })();
+  }, [selectedUserId, convo]);
+
   if (!isAuthenticated) {
     return (
       <div className="container py-32 text-center">
