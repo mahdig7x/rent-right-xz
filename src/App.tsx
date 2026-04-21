@@ -15,6 +15,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import AddListingPage from "@/pages/AddListingPage";
+import EditListingPage from "@/pages/EditListingPage";
 import MyListingsPage from "@/pages/MyListingsPage";
 import MyBookingsPage from "@/pages/MyBookingsPage";
 import BookingRequestsPage from "@/pages/BookingRequestsPage";
@@ -46,6 +47,7 @@ const App = () => (
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/listings/new" element={<AddListingPage />} />
+                    <Route path="/listings/:id/edit" element={<EditListingPage />} />
                     <Route path="/my-listings" element={<MyListingsPage />} />
                     <Route path="/my-bookings" element={<MyBookingsPage />} />
                     <Route path="/booking-requests" element={<BookingRequestsPage />} />

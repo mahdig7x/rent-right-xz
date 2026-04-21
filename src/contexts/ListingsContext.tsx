@@ -34,6 +34,13 @@ interface ListingsContextType {
     condition: 'new' | 'like_new' | 'good' | 'fair';
     images: string[];
   }) => Promise<ListingItem | null>;
+  updateItem: (id: string, data: Partial<{
+    title: string; description: string; category: string;
+    price_per_day: number; location: string;
+    condition: 'new' | 'like_new' | 'good' | 'fair';
+    status: 'available' | 'booked' | 'unavailable';
+    images: string[];
+  }>) => Promise<boolean>;
   deleteItem: (id: string) => Promise<boolean>;
   refreshItems: () => Promise<void>;
 }
@@ -112,6 +119,13 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     return newItem as ListingItem;
   };
 
+  const updateItem: ListingsContextType['updateItem'] = async (id, data) => {
+    const { error } = await supabase.from('items').update(data).eq('id', id);
+    if (error) return false;
+    await fetchItems();
+    return true;
+  };
+
   const deleteItem = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('items').delete().eq('id', id);
     if (error) return false;
@@ -120,7 +134,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ListingsContext.Provider value={{ items, loading, addItem, deleteItem, refreshItems: fetchItems }}>
+    <ListingsContext.Provider value={{ items, loading, addItem, updateItem, deleteItem, refreshItems: fetchItems }}>
       {children}
     </ListingsContext.Provider>
   );
