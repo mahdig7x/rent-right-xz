@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import {
-  Users, Package, AlertTriangle, Activity, Shield,
-  Eye, CheckCircle2
+  Users, Package, AlertTriangle, Shield,
+  Eye, CheckCircle2, Flag, Ban, X
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -22,74 +22,94 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!user) return;
-    // Check admin role
     supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').then(({ data }) => {
       setIsAdmin(data && data.length > 0);
     });
   }, [user]);
 
-  useEffect(() => {
+  const loadData = useCallback(async () => {
     if (!isAdmin) return;
-    (async () => {
-      const [usersRes, itemsRes, reportsRes] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('items').select('id, title, moderation_status, created_at').order('created_at', { ascending: false }),
-        supabase.from('reports').select('*').order('created_at', { ascending: false }),
-      ]);
-      const allItems = itemsRes.data || [];
-      const allReports = reportsRes.data || [];
+    const [usersRes, itemsRes, reportsRes] = await Promise.all([
+      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+      supabase.from('items').select('id, title, moderation_status, created_at, owner_id').order('created_at', { ascending: false }),
+      supabase.from('reports').select('*').order('created_at', { ascending: false }),
+    ]);
+    const allItems = itemsRes.data || [];
+    const allReports = reportsRes.data || [];
 
-      // Fetch reporter profiles
-      const reporterIds = [...new Set(allReports.map((r: any) => r.user_id))];
-      let profilesMap: Record<string, string> = {};
-      if (reporterIds.length > 0) {
-        const { data: profs } = await supabase
-          .from('profiles')
-          .select('user_id, name')
-          .in('user_id', reporterIds);
-        if (profs) {
-          profilesMap = profs.reduce((acc, p) => { acc[p.user_id] = p.name; return acc; }, {} as Record<string, string>);
-        }
+    const reporterIds = [...new Set(allReports.map((r: any) => r.user_id))];
+    let profilesMap: Record<string, string> = {};
+    if (reporterIds.length > 0) {
+      const { data: profs } = await (supabase as any)
+        .from('profiles_public')
+        .select('user_id, name')
+        .in('user_id', reporterIds);
+      if (profs) {
+        profilesMap = profs.reduce((acc: any, p: any) => { acc[p.user_id] = p.name; return acc; }, {} as Record<string, string>);
       }
+    }
 
-      setItems(allItems);
-      setReports(allReports.map((r: any) => ({ ...r, profiles: { name: profilesMap[r.user_id] || 'مستخدم' } })));
-      setStats({
-        totalUsers: usersRes.count || 0,
-        totalListings: allItems.length,
-        pendingListings: allItems.filter((i: any) => i.moderation_status === 'pending_review').length,
-        openReports: allReports.filter((r: any) => r.status === 'submitted' || r.status === 'under_review').length,
-      });
-    })();
+    setItems(allItems);
+    setReports(allReports.map((r: any) => ({ ...r, reporter_name: profilesMap[r.user_id] || 'مستخدم' })));
+    setStats({
+      totalUsers: usersRes.count || 0,
+      totalListings: allItems.length,
+      pendingListings: allItems.filter((i: any) => i.moderation_status === 'pending_review').length,
+      openReports: allReports.filter((r: any) => r.status === 'submitted' || r.status === 'under_review').length,
+    });
   }, [isAdmin]);
 
-  if (isAdmin === null) return <div className="container py-32 text-center">{t('login.signing')}...</div>;
+  useEffect(() => { loadData(); }, [loadData]);
+
+  if (isAdmin === null) return <div className="container py-32 text-center text-muted-foreground">{t('admin.loading')}</div>;
   if (!isAdmin) return <Navigate to="/" replace />;
 
-  const handleApprove = async (itemId: string) => {
-    await supabase.from('items').update({ moderation_status: 'approved' as any }).eq('id', itemId);
-    setItems(prev => prev.map(i => i.id === itemId ? { ...i, moderation_status: 'approved' } : i));
-    toast({ title: 'تمت الموافقة على الإعلان' });
+  const logAction = async (actionType: any, targetId: string, targetLabel: string, note?: string) => {
+    if (!user) return;
+    await supabase.from('admin_actions').insert({
+      action_type: actionType,
+      admin_id: user.id,
+      target_id: targetId,
+      target_label: targetLabel,
+      note: note || null,
+    });
   };
 
-  const handleResolveReport = async (reportId: string) => {
-    await supabase.from('reports').update({ status: 'resolved' as any, resolved_at: new Date().toISOString() }).eq('id', reportId);
-    setReports(prev => prev.map(r => r.id === reportId ? { ...r, status: 'resolved' } : r));
-    toast({ title: 'تم حل البلاغ' });
+  const handleItemAction = async (item: any, status: 'approved' | 'flagged' | 'suspended') => {
+    const { error } = await supabase.from('items').update({ moderation_status: status }).eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), variant: 'destructive' }); return; }
+    const actionType = status === 'approved' ? 'listing_approved' : status === 'flagged' ? 'listing_flagged' : 'listing_suspended';
+    await logAction(actionType, item.id, item.title);
+    setItems(prev => prev.map(i => i.id === item.id ? { ...i, moderation_status: status } : i));
+    toast({ title: t(`admin.item_${status}`) });
+  };
+
+  const handleReport = async (report: any, action: 'resolved' | 'rejected') => {
+    const { error } = await supabase.from('reports').update({
+      status: action,
+      resolved_at: new Date().toISOString(),
+      resolved_by: user!.id,
+    }).eq('id', report.id);
+    if (error) { toast({ title: t('admin.failed'), variant: 'destructive' }); return; }
+    await logAction(action === 'resolved' ? 'report_resolved' : 'report_rejected', report.id, report.description.slice(0, 60));
+    setReports(prev => prev.map(r => r.id === report.id ? { ...r, status: action } : r));
+    toast({ title: t(`admin.report_${action}`) });
   };
 
   const statCards = [
-    { icon: Users, label: 'المستخدمون', value: stats.totalUsers, color: 'text-blue-500' },
-    { icon: Package, label: 'الإعلانات', value: stats.totalListings, color: 'text-green-500' },
-    { icon: Eye, label: 'بانتظار المراجعة', value: stats.pendingListings, color: 'text-yellow-500' },
-    { icon: AlertTriangle, label: 'بلاغات مفتوحة', value: stats.openReports, color: 'text-red-500' },
+    { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'text-blue-500' },
+    { icon: Package, label: t('admin.listings'), value: stats.totalListings, color: 'text-green-500' },
+    { icon: Eye, label: t('admin.pending'), value: stats.pendingListings, color: 'text-yellow-500' },
+    { icon: AlertTriangle, label: t('admin.openReports'), value: stats.openReports, color: 'text-red-500' },
   ];
+
+  const pendingItems = items.filter(i => i.moderation_status === 'pending_review' || i.moderation_status === 'flagged');
 
   return (
     <div className="container py-8">
       <div className="flex items-center gap-3 mb-8">
         <Shield className="h-8 w-8 text-primary" />
-        <h1 className="font-display text-2xl font-bold">{t('nav.admin') || 'لوحة الإدارة'}</h1>
+        <h1 className="font-display text-2xl font-bold">{t('admin.title')}</h1>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -104,22 +124,28 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Pending Items */}
       <Card className="p-6 mb-6">
-        <h2 className="font-display text-lg font-semibold mb-4">إعلانات بانتظار المراجعة</h2>
-        {items.filter(i => i.moderation_status === 'pending_review').length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">لا توجد إعلانات بانتظار المراجعة</p>
+        <h2 className="font-display text-lg font-semibold mb-4">{t('admin.itemsToReview')}</h2>
+        {pendingItems.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noItems')}</p>
         ) : (
           <div className="space-y-3">
-            {items.filter(i => i.moderation_status === 'pending_review').map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-semibold text-sm">{item.title}</p>
+            {pendingItems.map((item: any) => (
+              <div key={item.id} className="flex items-center justify-between rounded-lg border p-4 flex-wrap gap-3">
+                <div className="min-w-0">
+                  <Link to={`/items/${item.id}`} className="font-semibold text-sm hover:underline">{item.title}</Link>
                   <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
+                  <Badge variant="outline" className="text-[10px] mt-1">{item.moderation_status}</Badge>
                 </div>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleApprove(item.id)}>
-                    <CheckCircle2 className="me-1 h-4 w-4" />موافقة
+                <div className="flex gap-2 flex-wrap">
+                  <Button size="sm" onClick={() => handleItemAction(item, 'approved')}>
+                    <CheckCircle2 className="me-1 h-4 w-4" />{t('admin.approve')}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleItemAction(item, 'flagged')}>
+                    <Flag className="me-1 h-4 w-4" />{t('admin.flag')}
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => handleItemAction(item, 'suspended')}>
+                    <Ban className="me-1 h-4 w-4" />{t('admin.suspend')}
                   </Button>
                 </div>
               </div>
@@ -128,25 +154,31 @@ export default function AdminPage() {
         )}
       </Card>
 
-      {/* Reports */}
       <Card className="p-6">
-        <h2 className="font-display text-lg font-semibold mb-4">البلاغات</h2>
+        <h2 className="font-display text-lg font-semibold mb-4">{t('admin.reports')}</h2>
         {reports.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">لا توجد بلاغات</p>
+          <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noReports')}</p>
         ) : (
           <div className="space-y-3">
             {reports.map((report: any) => (
-              <div key={report.id} className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-semibold text-sm">{report.description?.substring(0, 80)}...</p>
-                  <p className="text-xs text-muted-foreground">من: {report.profiles?.name || 'مستخدم'}</p>
+              <div key={report.id} className="flex items-center justify-between rounded-lg border p-4 flex-wrap gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-sm break-words">{report.description?.substring(0, 120)}{report.description?.length > 120 ? '...' : ''}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('bookingRequests.renter')} {report.reporter_name}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant={report.status === 'resolved' ? 'default' : report.status === 'submitted' ? 'destructive' : 'secondary'}>
                     {report.status}
                   </Badge>
                   {(report.status === 'submitted' || report.status === 'under_review') && (
-                    <Button size="sm" variant="outline" onClick={() => handleResolveReport(report.id)}>حل</Button>
+                    <>
+                      <Button size="sm" onClick={() => handleReport(report, 'resolved')}>
+                        <CheckCircle2 className="me-1 h-4 w-4" />{t('admin.resolve')}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleReport(report, 'rejected')}>
+                        <X className="me-1 h-4 w-4" />{t('admin.reject')}
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
