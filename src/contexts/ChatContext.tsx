@@ -9,6 +9,7 @@ export interface ChatMessage {
   content: string;
   read: boolean;
   created_at: string;
+  booking_id?: string | null;
   sender_name?: string;
   sender_image?: string;
 }
