@@ -169,22 +169,54 @@ export default function MessagesPage() {
     </Card>
   );
 
+  const [otherUserFallback, setOtherUserFallback] = useState<{ name: string; image: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!selectedUserId || convo) { setOtherUserFallback(null); return; }
+    (async () => {
+      const { data } = await (supabase as any)
+        .from('profiles_public')
+        .select('name, profile_image')
+        .eq('user_id', selectedUserId)
+        .maybeSingle();
+      if (data) setOtherUserFallback({ name: data.name || 'User', image: data.profile_image });
+    })();
+  }, [selectedUserId, convo]);
+
+  const headerName = convo?.other_user_name || otherUserFallback?.name || '';
+  const headerImage = convo?.other_user_image || otherUserFallback?.image || null;
+
   const ChatPanel = () => (
     <Card className="flex flex-col h-full overflow-hidden">
-      {convo ? (
+      {selectedUserId ? (
         <>
           <div className="border-b p-4 flex items-center gap-3">
             <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8 shrink-0" onClick={() => setShowMobileChat(false)}>
               <ArrowLeft className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`} />
             </Button>
             <Avatar className="h-9 w-9">
-              <AvatarImage src={convo.other_user_image || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground">{convo.other_user_name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={headerImage || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground">{headerName.charAt(0) || '?'}</AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <p className="font-semibold text-sm">{convo.other_user_name}</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm truncate">{headerName}</p>
+              {selectedBookingId && bookingInfo && (
+                <p className="text-[10px] text-muted-foreground truncate">{t('messages.aboutBooking')}: {bookingInfo.title}</p>
+              )}
             </div>
+            {selectedBookingId && (
+              <Badge variant="outline" className="text-[10px] gap-1"><Package className="h-3 w-3" />{t('messages.bookingChat')}</Badge>
+            )}
           </div>
+          {selectedBookingId && bookingInfo && (
+            <div className="border-b bg-muted/40 p-3 flex items-center gap-3">
+              {bookingInfo.image && <img src={bookingInfo.image} alt="" className="h-10 w-10 rounded-lg object-cover" />}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold truncate">{bookingInfo.title}</p>
+                <p className="text-[10px] text-muted-foreground">{t(`bookingStatus.${bookingInfo.status}`)}</p>
+              </div>
+            </div>
+          )}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
               <div className="flex items-center justify-center h-full text-center">
