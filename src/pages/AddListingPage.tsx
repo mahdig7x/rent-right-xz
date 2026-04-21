@@ -13,6 +13,7 @@ import { CATEGORIES } from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Upload } from 'lucide-react';
+import { MapPin, ExternalLink, CheckCircle2 } from 'lucide-react';
 
 export default function AddListingPage() {
   const { user, profile } = useAuth();
@@ -23,7 +24,49 @@ export default function AddListingPage() {
   const [uploading, setUploading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [form, setForm] = useState({ title: '', description: '', category: '', price_per_day: '', location: profile?.location || '', condition: '' });
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationVerified, setLocationVerified] = useState(false);
   const update = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      toast({ title: 'المتصفح لا يدعم تحديد الموقع', variant: 'destructive' });
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setCoords({ lat: latitude, lng: longitude });
+        setLocationVerified(true);
+        // Reverse geocode via free Nominatim (no API key needed)
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ar`
+          );
+          const data = await res.json();
+          const city = data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || '';
+          const country = data.address?.country || '';
+          const label = [city, country].filter(Boolean).join('، ');
+          if (label) update('location', label);
+        } catch {/* ignore */}
+        setLocating(false);
+        toast({ title: 'تم تحديد موقعك ✅', description: 'يمكنك التحقق منه على خرائط Google' });
+      },
+      (err) => {
+        setLocating(false);
+        toast({ title: 'تعذّر تحديد الموقع', description: err.message, variant: 'destructive' });
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const mapsUrl = coords
+    ? `https://www.google.com/maps?q=${coords.lat},${coords.lng}`
+    : form.location
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(form.location)}`
+      : null;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -48,13 +91,17 @@ export default function AddListingPage() {
     if (!form.title || !form.description || !form.category || !form.price_per_day || !form.condition) {
       toast({ title: t('addListing.fillFields'), variant: 'destructive' }); return;
     }
+    if (!form.location) {
+      toast({ title: 'الرجاء تحديد موقع الإعلان', description: 'استخدم زر "موقعي الحالي" أو أدخله يدوياً', variant: 'destructive' });
+      return;
+    }
     setLoading(true);
     const result = await addItem({
       title: form.title,
       description: form.description,
       category: form.category,
       price_per_day: Number(form.price_per_day),
-      location: form.location,
+      location: coords ? `${form.location} (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})` : form.location,
       condition: form.condition as 'new' | 'like_new' | 'good' | 'fair',
       images: imageUrls.length > 0 ? imageUrls : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop'],
     });
