@@ -62,8 +62,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let profilesMap: Record<string, { name: string; profile_image: string | null }> = {};
     if (otherIds.length > 0) {
-      const { data: profilesData } = await supabase
-        .from('profiles')
+      const { data: profilesData } = await (supabase as any)
+        .from('profiles_public')
         .select('user_id, name, profile_image')
         .in('user_id', otherIds);
       if (profilesData) {
@@ -139,8 +139,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const senderIds = [...new Set((data || []).map((m: any) => m.sender_id))];
     let profilesMap: Record<string, { name: string; profile_image: string | null }> = {};
     if (senderIds.length > 0) {
-      const { data: profs } = await supabase
-        .from('profiles')
+      const { data: profs } = await (supabase as any)
+        .from('profiles_public')
         .select('user_id, name, profile_image')
         .in('user_id', senderIds);
       if (profs) {

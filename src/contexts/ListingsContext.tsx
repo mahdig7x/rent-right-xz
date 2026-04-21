@@ -69,8 +69,8 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     const ownerIds = [...new Set(itemsData.map(i => i.owner_id))];
     let profilesMap: Record<string, { name: string; profile_image: string | null }> = {};
     if (ownerIds.length > 0) {
-      const { data: profilesData } = await supabase
-        .from('profiles')
+      const { data: profilesData } = await (supabase as any)
+        .from('profiles_public')
         .select('user_id, name, profile_image')
         .in('user_id', ownerIds);
       if (profilesData) {
