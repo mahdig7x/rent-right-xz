@@ -10,11 +10,12 @@ import { CATEGORIES } from '@/types';
 import {
   Search, Shield, Star, ArrowRight, Zap, Users, Lock,
   Camera, Trees, Wrench, Dumbbell, Home, PartyPopper,
-  Car, Music, Package, CheckCircle2, TrendingUp, Heart
+  Car, Music, Package, CheckCircle2, TrendingUp, Heart, Sparkles
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/contexts/I18nContext';
+import logo from '@/assets/logo.png';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
@@ -48,62 +49,87 @@ export default function HomePage() {
   return (
     <div className="overflow-hidden">
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-accent via-background to-secondary">
-        {/* Decorative blobs */}
-        <div className="absolute top-20 start-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 end-10 w-96 h-96 bg-primary/8 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 start-1/2 w-40 h-40 bg-warning/5 rounded-full blur-2xl" />
+      <section className="relative min-h-[92vh] flex items-center bg-background overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-mesh" />
+        <div className="absolute inset-0 grid-pattern opacity-40" />
 
-        <div className="container relative z-10 py-16">
+        <div className="absolute top-20 -start-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-blob" />
+        <div className="absolute bottom-10 -end-20 w-[500px] h-[500px] bg-info/15 rounded-full blur-3xl animate-blob" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/3 start-1/2 w-72 h-72 bg-warning/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '8s' }} />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="absolute top-24 end-[8%] hidden lg:block animate-float"
+        >
+          <img src={logo} alt="" className="w-32 h-32 object-contain drop-shadow-2xl rotate-6" />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.6, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="absolute bottom-32 start-[6%] hidden lg:block animate-float"
+          style={{ animationDelay: '2s' }}
+        >
+          <img src={logo} alt="" className="w-20 h-20 object-contain drop-shadow-xl -rotate-12 opacity-60" />
+        </motion.div>
+
+        <div className="container relative z-10 py-20">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={stagger}
-            className="mx-auto max-w-3xl text-center"
+            className="mx-auto max-w-4xl text-center"
           >
+            <motion.div variants={fadeUp} className="flex justify-center mb-8 lg:hidden">
+              <img src={logo} alt="Rent Right" className="w-24 h-24 object-contain drop-shadow-xl" />
+            </motion.div>
+
             <motion.div variants={fadeUp}>
-              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-semibold tracking-wide border border-primary/20 bg-primary/5 text-primary">
-                ✨ {t('home.badge')}
+              <Badge variant="secondary" className="mb-6 px-4 py-2 text-xs font-bold tracking-wider uppercase border border-primary/30 bg-primary/10 text-primary backdrop-blur-sm">
+                <Sparkles className="h-3.5 w-3.5 me-1.5" />
+                {t('home.badge')}
               </Badge>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl leading-[1.1]">
+            <motion.h1 variants={fadeUp} className="font-display text-5xl font-black tracking-tight sm:text-6xl md:text-7xl lg:text-8xl leading-[0.95]">
               {t('home.title1')}
               <br />
-              <span className="bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent">
+              <span className="text-gradient inline-block mt-2">
                 {t('home.title2')}
               </span>
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            <motion.p variants={fadeUp} className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {t('home.subtitle')}
             </motion.p>
 
-            <motion.form variants={fadeUp} onSubmit={handleSearch} className="mt-10 flex gap-3 mx-auto max-w-xl">
+            <motion.form variants={fadeUp} onSubmit={handleSearch} className="mt-10 flex flex-col sm:flex-row gap-3 mx-auto max-w-2xl">
               <div className="relative flex-1">
-                <Search className="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute start-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder={t('home.searchPlaceholder')}
-                  className="ps-12 h-14 text-base rounded-xl border-2 border-border bg-card shadow-card focus:border-primary focus:shadow-card-hover transition-all"
+                  className="ps-14 h-16 text-base rounded-2xl border-2 border-border bg-card/80 backdrop-blur-md shadow-soft focus:border-primary focus:shadow-glow transition-all"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button type="submit" size="lg" className="h-14 px-8 rounded-xl text-base font-semibold shadow-elevated">
+              <Button type="submit" size="lg" className="h-16 px-10 rounded-2xl text-base font-bold shadow-glow bg-gradient-hero hover:opacity-90 transition-opacity">
                 {t('home.search')}
+                <ArrowRight className={`ms-2 h-5 w-5 ${isRtl ? 'rotate-180' : ''}`} />
               </Button>
             </motion.form>
 
-            {/* Stats */}
-            <motion.div variants={fadeUp} className="mt-12 flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            <motion.div variants={fadeUp} className="mt-14 flex flex-wrap items-center justify-center gap-10 md:gap-16">
               {[
                 { value: '2,500+', label: t('home.statItems') },
                 { value: '1,200+', label: t('home.statUsers') },
                 { value: '98%', label: t('home.statSatisfaction') },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
-                  <div className="font-display text-2xl md:text-3xl font-extrabold text-primary">{stat.value}</div>
-                  <div className="text-xs md:text-sm text-muted-foreground mt-0.5">{stat.label}</div>
+                  <div className="font-display text-3xl md:text-4xl font-black text-gradient">{stat.value}</div>
+                  <div className="text-xs md:text-sm text-muted-foreground mt-1 font-medium">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
