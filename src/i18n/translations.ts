@@ -4,6 +4,7 @@ export const translations: Record<Locale, Record<string, string>> = {
   en: {
     // Nav
     'nav.browse': 'Browse',
+    'nav.nearby': 'Nearby Map',
     'nav.dashboard': 'Dashboard',
     'nav.messages': 'Messages',
     'nav.listItem': 'List Item',
@@ -243,6 +244,24 @@ export const translations: Record<Locale, Record<string, string>> = {
     'messages.yesterday': 'Yesterday',
     'messages.startChat': 'Start the conversation by sending a message.',
     'messages.loginRequired': 'Please log in to view your messages.',
+    'messages.chat': 'Chat',
+    'messages.bookingChat': 'Booking chat',
+    'messages.aboutBooking': 'About booking',
+
+    // Nearby
+    'nearby.title': 'Find listings near you',
+    'nearby.subtitle': 'Explore items on the map. Click any marker to view and rent.',
+    'nearby.searchCity': 'Search city or address...',
+    'nearby.useMyLocation': 'Use my location',
+    'nearby.radius': 'Search radius',
+    'nearby.noResults': 'No items found within this area.',
+    'nearby.locating': 'Locating items on the map...',
+    'nearby.youAreHere': 'You are here',
+    'nearby.viewListing': 'View Listing',
+
+    // Item Details — Map
+    'details.locationMap': 'Location on Map',
+    'details.openInMaps': 'Open in Google Maps',
 
     // Scenario
     'scenario.homeTitle': 'عندك شغل في البيت؟ 🔨',
@@ -415,6 +434,7 @@ export const translations: Record<Locale, Record<string, string>> = {
   ar: {
     // Nav
     'nav.browse': 'تصفح',
+    'nav.nearby': 'خريطة قريبة',
     'nav.dashboard': 'لوحة التحكم',
     'nav.messages': 'الرسائل',
     'nav.listItem': 'أضف إعلان',
