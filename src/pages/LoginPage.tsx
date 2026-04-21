@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
@@ -16,19 +18,48 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) { toast({ title: t('login.fillFields'), variant: 'destructive' }); return; }
     setLoading(true);
+    setNeedsConfirm(false);
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
       toast({ title: t('login.welcomeBack') });
       navigate('/dashboard');
     } else {
-      toast({ title: result.error || 'Login failed', variant: 'destructive' });
+      const msg = (result.error || '').toLowerCase();
+      if (msg.includes('not confirmed') || msg.includes('email_not_confirmed')) {
+        setNeedsConfirm(true);
+        toast({
+          title: 'بريدك الإلكتروني غير موثّق',
+          description: 'تحقق من بريدك أو اطلب رسالة تأكيد جديدة من الزر بالأسفل.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({ title: result.error || 'Login failed', variant: 'destructive' });
+      }
     }
+  };
+
+  const resendConfirmation = async () => {
+    if (!email) {
+      toast({ title: 'أدخل بريدك الإلكتروني أولاً', variant: 'destructive' });
+      return;
+    }
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setResending(false);
+    if (error) toast({ title: 'تعذر إرسال الرسالة', description: error.message, variant: 'destructive' });
+    else toast({ title: 'تم إرسال رسالة التأكيد ✉️', description: 'تحقق من صندوق الوارد (والرسائل غير المرغوب فيها)' });
   };
 
   return (
@@ -55,6 +86,19 @@ export default function LoginPage() {
           <div><Label htmlFor="password">{t('login.password')}</Label><Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} /></div>
           <Button type="submit" className="w-full" disabled={loading}>{loading ? t('login.signing') : t('login.submit')}</Button>
         </form>
+        {needsConfirm && (
+          <div className="mt-4 rounded-lg border border-warning/40 bg-warning/10 p-3 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
+            <div className="flex-1 text-sm">
+              <p className="font-medium">بريدك الإلكتروني لم يُؤكَّد بعد</p>
+              <p className="text-xs text-muted-foreground mt-0.5">افتح الرسالة المرسلة إلى <span className="font-medium">{email}</span> واضغط على الرابط، أو أعد إرسالها:</p>
+              <Button size="sm" variant="outline" className="mt-2 gap-1.5" onClick={resendConfirmation} disabled={resending}>
+                {resending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                إعادة إرسال رسالة التأكيد
+              </Button>
+            </div>
+          </div>
+        )}
         <p className="mt-6 text-center text-sm text-muted-foreground">
           {t('login.noAccount')} <Link to="/register" className="font-medium text-primary hover:underline">{t('nav.signup')}</Link>
         </p>

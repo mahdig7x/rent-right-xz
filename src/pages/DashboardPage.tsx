@@ -28,9 +28,14 @@ export default function DashboardPage() {
       .then(({ data }) => { if (data) setBookings(data); });
   }, [user]);
 
-  if (loading) return <div className="container py-16 text-center text-muted-foreground">{t('common.loading') || '...'}</div>;
+  if (loading) return <div className="container py-16 text-center text-muted-foreground">{t('common.loading') || 'جارٍ التحميل...'}</div>;
   if (!user) return <Navigate to="/login" replace />;
-  if (!profile) return <div className="container py-16 text-center text-muted-foreground">{t('common.loading') || '...'}</div>;
+
+  const displayName =
+    profile?.name ||
+    (user.user_metadata?.name as string) ||
+    (user.user_metadata?.full_name as string) ||
+    (user.email ? user.email.split('@')[0] : 'User');
 
   const myListings = items.filter(i => i.owner_id === user.id);
   const myBookings = bookings.filter(b => b.renter_id === user.id);
@@ -47,7 +52,7 @@ export default function DashboardPage() {
     <div className="container py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold">{t('dash.welcome')} {profile.name.split(' ')[0]}</h1>
+          <h1 className="font-display text-2xl font-bold">{t('dash.welcome')} {displayName.split(' ')[0]}</h1>
           <p className="text-sm text-muted-foreground">{t('dash.subtitle')}</p>
         </div>
         <Link to="/listings/new"><Button><Plus className="me-1.5 h-4 w-4" />{t('nav.listItem')}</Button></Link>

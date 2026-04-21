@@ -48,8 +48,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
-      .single();
-    if (data) setProfile(data as Profile);
+      .maybeSingle();
+    if (data) {
+      setProfile(data as Profile);
+      return;
+    }
+    // Auto-create a minimal profile if missing (e.g. legacy Google users)
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (!u) return;
+    const fallbackName =
+      (u.user_metadata?.name as string) ||
+      (u.user_metadata?.full_name as string) ||
+      (u.email ? u.email.split('@')[0] : 'User');
+    const { data: created } = await supabase
+      .from('profiles')
+      .insert({
+        user_id: u.id,
+        email: u.email ?? '',
+        name: fallbackName,
+        profile_image: (u.user_metadata?.avatar_url as string) ?? null,
+      })
+      .select('*')
+      .maybeSingle();
+    if (created) setProfile(created as Profile);
   }, []);
 
   const refreshProfile = useCallback(async () => {

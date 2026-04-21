@@ -25,7 +25,10 @@ export default function RegisterPage() {
     const result = await register(form);
     setLoading(false);
     if (result.success) {
-      toast({ title: t('register.created'), description: 'تحقق من بريدك الإلكتروني لتأكيد حسابك' });
+      toast({
+        title: 'تم إنشاء حسابك ✅',
+        description: 'أرسلنا رسالة تأكيد إلى بريدك. اضغط الرابط داخلها ثم سجّل الدخول. أو استخدم Google لتسجيل دخول مباشر دون تأكيد.',
+      });
       navigate('/login');
     } else {
       toast({ title: result.error || 'Registration failed', variant: 'destructive' });
