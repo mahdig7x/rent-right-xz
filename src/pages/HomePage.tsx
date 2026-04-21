@@ -10,11 +10,12 @@ import { CATEGORIES } from '@/types';
 import {
   Search, Shield, Star, ArrowRight, Zap, Users, Lock,
   Camera, Trees, Wrench, Dumbbell, Home, PartyPopper,
-  Car, Music, Package, CheckCircle2, TrendingUp, Heart
+  Car, Music, Package, CheckCircle2, TrendingUp, Heart, Sparkles
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/contexts/I18nContext';
+import logo from '@/assets/logo.png';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
