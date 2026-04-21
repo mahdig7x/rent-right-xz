@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { useListings } from '@/contexts/ListingsContext';
@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { t, isRtl } = useI18n();
   const { items } = useListings();
   const { totalUnread } = useChat();
@@ -28,7 +28,9 @@ export default function DashboardPage() {
       .then(({ data }) => { if (data) setBookings(data); });
   }, [user]);
 
-  if (!user || !profile) return null;
+  if (loading) return <div className="container py-16 text-center text-muted-foreground">{t('common.loading') || '...'}</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!profile) return <div className="container py-16 text-center text-muted-foreground">{t('common.loading') || '...'}</div>;
 
   const myListings = items.filter(i => i.owner_id === user.id);
   const myBookings = bookings.filter(b => b.renter_id === user.id);
