@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe } from 'lucide-react';
 import { useState } from 'react';
+import logo from '@/assets/logo.png';
 
 export default function Navbar() {
   const { isAuthenticated, profile, logout } = useAuth();
@@ -22,11 +23,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">RR</span>
-          </div>
-          <span className="font-display text-xl font-bold text-foreground">Rent Right</span>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <img src={logo} alt="Rent Right" className="h-10 w-10 object-contain rounded-lg transition-transform group-hover:scale-105" />
+          <span className="font-display text-xl font-extrabold tracking-tight text-foreground hidden sm:inline">Rent<span className="text-primary">Right</span></span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

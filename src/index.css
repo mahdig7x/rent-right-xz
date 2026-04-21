@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -38,6 +38,11 @@
     --success: 152 55% 40%;
     --warning: 38 92% 50%;
     --info: 210 80% 55%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(152 55% 40%) 0%, hsl(168 60% 45%) 50%, hsl(180 50% 50%) 100%);
+    --gradient-mesh: radial-gradient(at 20% 30%, hsl(152 55% 40% / 0.15) 0px, transparent 50%), radial-gradient(at 80% 20%, hsl(168 60% 50% / 0.12) 0px, transparent 50%), radial-gradient(at 50% 80%, hsl(38 92% 60% / 0.08) 0px, transparent 50%);
+    --shadow-glow: 0 0 60px hsl(152 55% 40% / 0.25);
+    --shadow-soft: 0 4px 20px -4px hsl(200 20% 12% / 0.08);
   }
 
   .dark {
@@ -77,14 +82,33 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "ss01", "cv11";
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold tracking-tight;
   }
+  [dir="rtl"] body,
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
+  [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+    font-family: 'Cairo', 'Tajawal', system-ui, sans-serif;
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .text-balance { text-wrap: balance; }
+  .bg-gradient-hero { background: var(--gradient-hero); }
+  .bg-gradient-mesh { background: var(--gradient-mesh); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .text-gradient {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .grid-pattern {
+    background-image: linear-gradient(hsl(var(--border) / 0.4) 1px, transparent 1px),
+                      linear-gradient(90deg, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 48px 48px;
   }
 }
