@@ -44,7 +44,9 @@ export default function MyListingsPage() {
                 </div>
               </div>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Edit className="h-4 w-4" /></Button>
+                <Link to={`/listings/${item.id}/edit`}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8"><Edit className="h-4 w-4" /></Button>
+                </Link>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(item.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
             </Card>

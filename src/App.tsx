@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { ListingsProvider } from "@/contexts/ListingsContext";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import HomePage from "@/pages/HomePage";
@@ -15,6 +16,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import AddListingPage from "@/pages/AddListingPage";
+import EditListingPage from "@/pages/EditListingPage";
 import MyListingsPage from "@/pages/MyListingsPage";
 import MyBookingsPage from "@/pages/MyBookingsPage";
 import BookingRequestsPage from "@/pages/BookingRequestsPage";
@@ -34,6 +36,7 @@ const App = () => (
         <AuthProvider>
           <ChatProvider>
             <ListingsProvider>
+            <NotificationsProvider>
             <BrowserRouter>
               <div className="flex min-h-screen flex-col">
                 <Navbar />
@@ -46,6 +49,7 @@ const App = () => (
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/listings/new" element={<AddListingPage />} />
+                    <Route path="/listings/:id/edit" element={<EditListingPage />} />
                     <Route path="/my-listings" element={<MyListingsPage />} />
                     <Route path="/my-bookings" element={<MyBookingsPage />} />
                     <Route path="/booking-requests" element={<BookingRequestsPage />} />
@@ -59,6 +63,7 @@ const App = () => (
                 <Footer />
               </div>
             </BrowserRouter>
+            </NotificationsProvider>
             </ListingsProvider>
           </ChatProvider>
         </AuthProvider>
