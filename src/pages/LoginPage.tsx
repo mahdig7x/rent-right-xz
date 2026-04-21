@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
@@ -16,19 +18,48 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) { toast({ title: t('login.fillFields'), variant: 'destructive' }); return; }
     setLoading(true);
+    setNeedsConfirm(false);
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
       toast({ title: t('login.welcomeBack') });
       navigate('/dashboard');
     } else {
-      toast({ title: result.error || 'Login failed', variant: 'destructive' });
+      const msg = (result.error || '').toLowerCase();
+      if (msg.includes('not confirmed') || msg.includes('email_not_confirmed')) {
+        setNeedsConfirm(true);
+        toast({
+          title: 'بريدك الإلكتروني غير موثّق',
+          description: 'تحقق من بريدك أو اطلب رسالة تأكيد جديدة من الزر بالأسفل.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({ title: result.error || 'Login failed', variant: 'destructive' });
+      }
     }
+  };
+
+  const resendConfirmation = async () => {
+    if (!email) {
+      toast({ title: 'أدخل بريدك الإلكتروني أولاً', variant: 'destructive' });
+      return;
+    }
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setResending(false);
+    if (error) toast({ title: 'تعذر إرسال الرسالة', description: error.message, variant: 'destructive' });
+    else toast({ title: 'تم إرسال رسالة التأكيد ✉️', description: 'تحقق من صندوق الوارد (والرسائل غير المرغوب فيها)' });
   };
 
   return (
