@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { Check, X, Loader2 } from 'lucide-react';
 
 export default function BookingRequestsPage() {
   const { t } = useI18n();
   const { user } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -36,10 +38,16 @@ export default function BookingRequestsPage() {
     })();
   }, [user]);
 
-  const handleAction = async (id: string, status: string) => {
-    await supabase.from('bookings').update({ status: status as any }).eq('id', id);
+  const handleAction = async (id: string, status: 'confirmed' | 'rejected') => {
+    setBusyId(id);
+    const { error } = await supabase.from('bookings').update({ status }).eq('id', id);
+    setBusyId(null);
+    if (error) {
+      toast({ title: t('bookingRequests.failed'), variant: 'destructive' });
+      return;
+    }
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
-    toast({ title: status === 'confirmed' ? 'تم قبول الطلب' : 'تم رفض الطلب' });
+    toast({ title: status === 'confirmed' ? t('bookingRequests.accepted') : t('bookingRequests.rejected') });
   };
 
   return (
@@ -50,19 +58,26 @@ export default function BookingRequestsPage() {
       ) : (
         <div className="space-y-3">
           {requests.map((r: any) => (
-            <Card key={r.id} className="flex items-center gap-4 p-4">
+            <Card key={r.id} className="flex items-center gap-4 p-4 flex-wrap">
               <img src={r.items?.images?.[0] || ''} alt={r.items?.title} className="h-16 w-16 rounded-lg object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{r.items?.title}</p>
                 <p className="text-xs text-muted-foreground">{r.start_date} → {r.end_date} · ${r.total_price}</p>
-                <p className="text-xs text-muted-foreground">من: {r.renter?.name || 'مستخدم'}</p>
+                <p className="text-xs text-muted-foreground">{t('bookingRequests.renter')} {r.renter?.name}</p>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant={r.status === 'confirmed' ? 'default' : r.status === 'pending' ? 'secondary' : 'outline'}>{r.status}</Badge>
+                <Badge variant={r.status === 'confirmed' ? 'default' : r.status === 'pending' ? 'secondary' : 'outline'}>
+                  {t(`bookingStatus.${r.status}`)}
+                </Badge>
                 {r.status === 'pending' && (
                   <>
-                    <Button size="sm" onClick={() => handleAction(r.id, 'confirmed')}>قبول</Button>
-                    <Button size="sm" variant="outline" onClick={() => handleAction(r.id, 'rejected')}>رفض</Button>
+                    <Button size="sm" disabled={busyId === r.id} onClick={() => handleAction(r.id, 'confirmed')}>
+                      {busyId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="me-1 h-4 w-4" />}
+                      {t('bookingRequests.accept')}
+                    </Button>
+                    <Button size="sm" variant="outline" disabled={busyId === r.id} onClick={() => handleAction(r.id, 'rejected')}>
+                      <X className="me-1 h-4 w-4" />{t('bookingRequests.reject')}
+                    </Button>
                   </>
                 )}
               </div>
