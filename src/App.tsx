@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { ListingsProvider } from "@/contexts/ListingsContext";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import HomePage from "@/pages/HomePage";
@@ -35,6 +36,7 @@ const App = () => (
         <AuthProvider>
           <ChatProvider>
             <ListingsProvider>
+            <NotificationsProvider>
             <BrowserRouter>
               <div className="flex min-h-screen flex-col">
                 <Navbar />
@@ -61,6 +63,7 @@ const App = () => (
                 <Footer />
               </div>
             </BrowserRouter>
+            </NotificationsProvider>
             </ListingsProvider>
           </ChatProvider>
         </AuthProvider>
