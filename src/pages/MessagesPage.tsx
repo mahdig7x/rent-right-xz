@@ -133,7 +133,7 @@ export default function MessagesPage() {
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  const ConversationList = () => (
+  const conversationList = (
     <Card className="flex flex-col h-full overflow-hidden">
       <div className="p-4 border-b">
         <h2 className="font-display text-lg font-bold mb-3">{t('messages.title')}</h2>
@@ -186,7 +186,7 @@ export default function MessagesPage() {
   const headerName = convo?.other_user_name || otherUserFallback?.name || '';
   const headerImage = convo?.other_user_image || otherUserFallback?.image || null;
 
-  const ChatPanel = () => (
+  const chatPanel = (
     <Card className="flex flex-col h-full overflow-hidden">
       {selectedUserId ? (
         <>
@@ -294,8 +294,8 @@ export default function MessagesPage() {
   return (
     <div className="container py-6 md:py-8">
       <div className="grid gap-4 lg:grid-cols-3 h-[calc(100vh-12rem)]">
-        <div className={cn("lg:col-span-1", showMobileChat ? 'hidden lg:block' : 'block')}><ConversationList /></div>
-        <div className={cn("lg:col-span-2", !showMobileChat ? 'hidden lg:block' : 'block')}><ChatPanel /></div>
+        <div className={cn("lg:col-span-1", showMobileChat ? 'hidden lg:block' : 'block')}>{conversationList}</div>
+        <div className={cn("lg:col-span-2", !showMobileChat ? 'hidden lg:block' : 'block')}>{chatPanel}</div>
       </div>
     </div>
   );
