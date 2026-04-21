@@ -12,9 +12,10 @@ import {
   Camera, Trees, Wrench, Dumbbell, Home, PartyPopper,
   Car, Music, Package, CheckCircle2, TrendingUp, Heart, Sparkles
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/contexts/I18nContext';
+import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo.png';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
@@ -39,7 +40,25 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { t, isRtl } = useI18n();
   const { items } = useListings();
-  const featured = items.filter(i => i.status === 'available').slice(0, 4);
+  const featured = items.filter(i => i.status === 'available' && i.moderation_status === 'approved').slice(0, 4);
+  const [liveStats, setLiveStats] = useState({ items: 0, users: 0, satisfaction: 98 });
+
+  useEffect(() => {
+    (async () => {
+      const [itemsRes, usersRes, reviewsRes] = await Promise.all([
+        supabase.from('items').select('id', { count: 'exact', head: true }).eq('moderation_status', 'approved'),
+        (supabase as any).from('profiles_public').select('id', { count: 'exact', head: true }),
+        supabase.from('reviews').select('rating'),
+      ]);
+      const ratings = reviewsRes.data || [];
+      const avg = ratings.length > 0 ? Math.round((ratings.reduce((s: number, r: any) => s + r.rating, 0) / ratings.length) * 20) : 98;
+      setLiveStats({
+        items: itemsRes.count || 0,
+        users: usersRes.count || 0,
+        satisfaction: avg,
+      });
+    })();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,9 +142,9 @@ export default function HomePage() {
 
             <motion.div variants={fadeUp} className="mt-14 flex flex-wrap items-center justify-center gap-10 md:gap-16">
               {[
-                { value: '2,500+', label: t('home.statItems') },
-                { value: '1,200+', label: t('home.statUsers') },
-                { value: '98%', label: t('home.statSatisfaction') },
+                { value: liveStats.items > 0 ? `${liveStats.items}+` : '—', label: t('home.statItems') },
+                { value: liveStats.users > 0 ? `${liveStats.users}+` : '—', label: t('home.statUsers') },
+                { value: `${liveStats.satisfaction}%`, label: t('home.statSatisfaction') },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <div className="font-display text-3xl md:text-4xl font-black text-gradient">{stat.value}</div>
