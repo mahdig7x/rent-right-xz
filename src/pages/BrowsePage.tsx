@@ -24,7 +24,7 @@ export default function BrowsePage() {
       if (location !== 'all' && item.location !== location) return false;
       return true;
     });
-  }, [search, category, location]);
+  }, [search, category, location, items]);
 
   return (
     <div className="container py-8">

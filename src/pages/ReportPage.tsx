@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useI18n } from '@/contexts/I18nContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,19 +9,43 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function ReportPage() {
   const { t } = useI18n();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ type: '', description: '', bookingId: '' });
+  const [searchParams] = useSearchParams();
+  const [form, setForm] = useState({
+    type: '',
+    description: '',
+    bookingId: searchParams.get('booking') || '',
+    itemId: searchParams.get('item') || '',
+  });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.description) { toast({ title: t('report.descRequired'), variant: 'destructive' }); return; }
+    if (!isAuthenticated || !user) {
+      navigate('/login');
+      return;
+    }
+    if (!form.description.trim()) {
+      toast({ title: t('report.descRequired'), variant: 'destructive' });
+      return;
+    }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
+    const { error } = await supabase.from('reports').insert({
+      user_id: user.id,
+      description: form.description,
+      booking_id: form.bookingId || null,
+      item_id: form.itemId || null,
+    });
     setLoading(false);
+    if (error) {
+      toast({ title: 'فشل في إرسال البلاغ', description: error.message, variant: 'destructive' });
+      return;
+    }
     toast({ title: t('report.submitted'), description: t('report.submittedDesc') });
     navigate('/dashboard');
   };
@@ -42,12 +67,8 @@ export default function ReportPage() {
               </SelectContent>
             </Select>
           </div>
-          <div><Label>{t('report.bookingId')}</Label><Input placeholder="e.g. b1" value={form.bookingId} onChange={e => setForm(f => ({ ...f, bookingId: e.target.value }))} /></div>
+          <div><Label>{t('report.bookingId')}</Label><Input placeholder="UUID" value={form.bookingId} onChange={e => setForm(f => ({ ...f, bookingId: e.target.value }))} /></div>
           <div><Label>{t('report.description')} *</Label><Textarea rows={5} placeholder={t('report.descPlaceholder')} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} /></div>
-          <div>
-            <Label>{t('report.evidence')}</Label>
-            <div className="mt-1 rounded-lg border-2 border-dashed p-6 text-center text-sm text-muted-foreground">{t('report.evidenceDesc')}</div>
-          </div>
           <div className="flex gap-3">
             <Button type="submit" className="flex-1" disabled={loading}>{loading ? t('report.submitting') : t('report.submit')}</Button>
             <Button type="button" variant="outline" onClick={() => navigate(-1)}>{t('report.cancel')}</Button>

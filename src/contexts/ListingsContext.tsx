@@ -47,20 +47,40 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data: itemsData, error } = await supabase
       .from('items')
-      .select('*, profiles!items_owner_id_fkey(name, profile_image)')
+      .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      const mapped = data.map((item: any) => ({
-        ...item,
-        images: item.images || [],
-        owner_name: item.profiles?.name || '',
-        owner_image: item.profiles?.profile_image || null,
-      }));
-      setItems(mapped);
+    if (error || !itemsData) {
+      setItems([]);
+      setLoading(false);
+      return;
     }
+
+    // Fetch owner profiles in a single query
+    const ownerIds = [...new Set(itemsData.map(i => i.owner_id))];
+    let profilesMap: Record<string, { name: string; profile_image: string | null }> = {};
+    if (ownerIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, name, profile_image')
+        .in('user_id', ownerIds);
+      if (profilesData) {
+        profilesMap = profilesData.reduce((acc, p) => {
+          acc[p.user_id] = { name: p.name, profile_image: p.profile_image };
+          return acc;
+        }, {} as Record<string, { name: string; profile_image: string | null }>);
+      }
+    }
+
+    const mapped: ListingItem[] = itemsData.map((item: any) => ({
+      ...item,
+      images: item.images && item.images.length > 0 ? item.images : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop'],
+      owner_name: profilesMap[item.owner_id]?.name || 'مستخدم',
+      owner_image: profilesMap[item.owner_id]?.profile_image || null,
+    }));
+    setItems(mapped);
     setLoading(false);
   }, []);
 
@@ -83,6 +103,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
       .insert({
         ...data,
         owner_id: user.id,
+        moderation_status: 'approved',
       })
       .select()
       .single();

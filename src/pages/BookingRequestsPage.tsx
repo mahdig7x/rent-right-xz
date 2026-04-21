@@ -14,9 +14,26 @@ export default function BookingRequestsPage() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('bookings').select('*, items(title, images), renter:profiles!bookings_renter_id_fkey(name)')
-      .eq('lessor_id', user.id).order('created_at', { ascending: false })
-      .then(({ data }) => { if (data) setRequests(data); });
+    (async () => {
+      const { data: bookingsData } = await supabase
+        .from('bookings')
+        .select('*, items(title, images)')
+        .eq('lessor_id', user.id)
+        .order('created_at', { ascending: false });
+      if (!bookingsData) return;
+      const renterIds = [...new Set(bookingsData.map((b: any) => b.renter_id))];
+      let profilesMap: Record<string, string> = {};
+      if (renterIds.length > 0) {
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('user_id, name')
+          .in('user_id', renterIds);
+        if (profs) {
+          profilesMap = profs.reduce((acc, p) => { acc[p.user_id] = p.name; return acc; }, {} as Record<string, string>);
+        }
+      }
+      setRequests(bookingsData.map((b: any) => ({ ...b, renter: { name: profilesMap[b.renter_id] || 'مستخدم' } })));
+    })();
   }, [user]);
 
   const handleAction = async (id: string, status: string) => {
