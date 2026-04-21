@@ -331,8 +331,8 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // Home
     'home.badge': 'الطريقة الأذكى للإيجار',
-    'home.title1': 'استأجر ما تحتاجه.',
-    'home.title2': 'شارك ما لديك.',
+    'home.title1': 'استأجر اللي تبيه',
+    'home.title2': 'وأجــــر اللي عنـــــــدك',
     'home.subtitle': 'احصل على الأدوات والمعدات والإلكترونيات والمزيد من أشخاص بالقرب منك — بدون شراء.',
     'home.searchPlaceholder': 'ابحث عن أغراض...',
     'home.search': 'بحث',
