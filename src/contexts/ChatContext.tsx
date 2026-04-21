@@ -9,6 +9,7 @@ export interface ChatMessage {
   content: string;
   read: boolean;
   created_at: string;
+  booking_id?: string | null;
   sender_name?: string;
   sender_image?: string;
 }
@@ -26,8 +27,8 @@ export interface ChatConversation {
 interface ChatContextType {
   conversations: ChatConversation[];
   loading: boolean;
-  getMessages: (otherUserId: string) => Promise<ChatMessage[]>;
-  sendMessage: (receiverId: string, content: string) => Promise<boolean>;
+  getMessages: (otherUserId: string, bookingId?: string | null) => Promise<ChatMessage[]>;
+  sendMessage: (receiverId: string, content: string, bookingId?: string | null) => Promise<boolean>;
   totalUnread: number;
   refreshConversations: () => Promise<void>;
 }
@@ -120,13 +121,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => { supabase.removeChannel(channel); };
   }, [user, fetchConversations]);
 
-  const getMessages = useCallback(async (otherUserId: string): Promise<ChatMessage[]> => {
+  const getMessages = useCallback(async (otherUserId: string, bookingId?: string | null): Promise<ChatMessage[]> => {
     if (!user) return [];
-    const { data } = await supabase
+    let query = supabase
       .from('messages')
       .select('*')
       .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
       .order('created_at', { ascending: true });
+    if (bookingId) query = query.eq('booking_id', bookingId);
+    const { data } = await query;
 
     await supabase
       .from('messages')
@@ -158,11 +161,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   }, [user]);
 
-  const sendMessage = useCallback(async (receiverId: string, content: string): Promise<boolean> => {
+  const sendMessage = useCallback(async (receiverId: string, content: string, bookingId?: string | null): Promise<boolean> => {
     if (!user) return false;
+    const payload: any = { sender_id: user.id, receiver_id: receiverId, content };
+    if (bookingId) payload.booking_id = bookingId;
     const { error } = await supabase
       .from('messages')
-      .insert({ sender_id: user.id, receiver_id: receiverId, content });
+      .insert(payload);
     if (error) return false;
     await fetchConversations();
     return true;

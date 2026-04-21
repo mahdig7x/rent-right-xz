@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChat, ChatMessage } from '@/contexts/ChatContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Send, MessageSquare, ArrowLeft, Search, Check, CheckCheck } from 'lucide-react';
+import { Send, MessageSquare, ArrowLeft, Search, Check, CheckCheck, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -17,25 +18,46 @@ export default function MessagesPage() {
   const { user, isAuthenticated } = useAuth();
   const { conversations, getMessages, sendMessage } = useChat();
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
 
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(conversations[0]?.other_user_id || null);
+  const initialUser = params.get('user') || conversations[0]?.other_user_id || null;
+  const initialBooking = params.get('booking');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(initialUser);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(initialBooking);
+  const [bookingInfo, setBookingInfo] = useState<{ title: string; image?: string; status: string } | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMsg, setNewMsg] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showMobileChat, setShowMobileChat] = useState(false);
+  const [showMobileChat, setShowMobileChat] = useState(!!initialUser);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const convo = conversations.find(c => c.other_user_id === selectedUserId);
 
-  const loadMessages = useCallback(async (userId: string) => {
-    const msgs = await getMessages(userId);
+  const loadMessages = useCallback(async (userId: string, bookingId: string | null) => {
+    const msgs = await getMessages(userId, bookingId);
     setMessages(msgs);
   }, [getMessages]);
 
   useEffect(() => {
-    if (selectedUserId) loadMessages(selectedUserId);
-  }, [selectedUserId, loadMessages]);
+    if (selectedUserId) loadMessages(selectedUserId, selectedBookingId);
+  }, [selectedUserId, selectedBookingId, loadMessages]);
+
+  // Load booking info when bookingId is provided
+  useEffect(() => {
+    if (!selectedBookingId) { setBookingInfo(null); return; }
+    (async () => {
+      const { data } = await supabase
+        .from('bookings')
+        .select('status, items(title, images)')
+        .eq('id', selectedBookingId)
+        .maybeSingle();
+      if (data) {
+        const it: any = (data as any).items;
+        setBookingInfo({ title: it?.title || '', image: it?.images?.[0], status: (data as any).status });
+      }
+    })();
+  }, [selectedBookingId]);
 
   const filteredConvos = conversations.filter(c =>
     c.other_user_name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -54,9 +76,23 @@ export default function MessagesPage() {
   // Poll for new messages
   useEffect(() => {
     if (!selectedUserId) return;
-    const interval = setInterval(() => loadMessages(selectedUserId), 5000);
+    const interval = setInterval(() => loadMessages(selectedUserId, selectedBookingId), 5000);
     return () => clearInterval(interval);
-  }, [selectedUserId, loadMessages]);
+  }, [selectedUserId, selectedBookingId, loadMessages]);
+
+  const [otherUserFallback, setOtherUserFallback] = useState<{ name: string; image: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!selectedUserId || convo) { setOtherUserFallback(null); return; }
+    (async () => {
+      const { data } = await (supabase as any)
+        .from('profiles_public')
+        .select('name, profile_image')
+        .eq('user_id', selectedUserId)
+        .maybeSingle();
+      if (data) setOtherUserFallback({ name: data.name || 'User', image: data.profile_image });
+    })();
+  }, [selectedUserId, convo]);
 
   if (!isAuthenticated) {
     return (
@@ -71,16 +107,19 @@ export default function MessagesPage() {
 
   const handleSend = async () => {
     if (!newMsg.trim() || !selectedUserId) return;
-    const ok = await sendMessage(selectedUserId, newMsg);
+    const ok = await sendMessage(selectedUserId, newMsg, selectedBookingId);
     if (ok) {
       setNewMsg('');
-      await loadMessages(selectedUserId);
+      await loadMessages(selectedUserId, selectedBookingId);
       inputRef.current?.focus();
     }
   };
 
   const selectConvo = (userId: string) => {
     setSelectedUserId(userId);
+    setSelectedBookingId(null);
+    setBookingInfo(null);
+    setParams({}, { replace: true });
     setShowMobileChat(true);
   };
 
@@ -144,22 +183,40 @@ export default function MessagesPage() {
     </Card>
   );
 
+  const headerName = convo?.other_user_name || otherUserFallback?.name || '';
+  const headerImage = convo?.other_user_image || otherUserFallback?.image || null;
+
   const ChatPanel = () => (
     <Card className="flex flex-col h-full overflow-hidden">
-      {convo ? (
+      {selectedUserId ? (
         <>
           <div className="border-b p-4 flex items-center gap-3">
             <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8 shrink-0" onClick={() => setShowMobileChat(false)}>
               <ArrowLeft className={`h-4 w-4 ${isRtl ? 'rotate-180' : ''}`} />
             </Button>
             <Avatar className="h-9 w-9">
-              <AvatarImage src={convo.other_user_image || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground">{convo.other_user_name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={headerImage || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground">{headerName.charAt(0) || '?'}</AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <p className="font-semibold text-sm">{convo.other_user_name}</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm truncate">{headerName}</p>
+              {selectedBookingId && bookingInfo && (
+                <p className="text-[10px] text-muted-foreground truncate">{t('messages.aboutBooking')}: {bookingInfo.title}</p>
+              )}
             </div>
+            {selectedBookingId && (
+              <Badge variant="outline" className="text-[10px] gap-1"><Package className="h-3 w-3" />{t('messages.bookingChat')}</Badge>
+            )}
           </div>
+          {selectedBookingId && bookingInfo && (
+            <div className="border-b bg-muted/40 p-3 flex items-center gap-3">
+              {bookingInfo.image && <img src={bookingInfo.image} alt="" className="h-10 w-10 rounded-lg object-cover" />}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold truncate">{bookingInfo.title}</p>
+                <p className="text-[10px] text-muted-foreground">{t(`bookingStatus.${bookingInfo.status}`)}</p>
+              </div>
+            </div>
+          )}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
               <div className="flex items-center justify-center h-full text-center">

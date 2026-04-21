@@ -99,7 +99,9 @@ export type Database = {
           description: string
           id: string
           images: string[] | null
+          latitude: number | null
           location: string
+          longitude: number | null
           moderation_note: string | null
           moderation_status: Database["public"]["Enums"]["moderation_status"]
           owner_id: string
@@ -115,7 +117,9 @@ export type Database = {
           description?: string
           id?: string
           images?: string[] | null
+          latitude?: number | null
           location?: string
+          longitude?: number | null
           moderation_note?: string | null
           moderation_status?: Database["public"]["Enums"]["moderation_status"]
           owner_id: string
@@ -131,7 +135,9 @@ export type Database = {
           description?: string
           id?: string
           images?: string[] | null
+          latitude?: number | null
           location?: string
+          longitude?: number | null
           moderation_note?: string | null
           moderation_status?: Database["public"]["Enums"]["moderation_status"]
           owner_id?: string
@@ -144,6 +150,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          booking_id: string | null
           content: string
           created_at: string
           id: string
@@ -152,6 +159,7 @@ export type Database = {
           sender_id: string
         }
         Insert: {
+          booking_id?: string | null
           content: string
           created_at?: string
           id?: string
@@ -160,6 +168,7 @@ export type Database = {
           sender_id: string
         }
         Update: {
+          booking_id?: string | null
           content?: string
           created_at?: string
           id?: string
@@ -167,7 +176,15 @@ export type Database = {
           receiver_id?: string
           sender_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {

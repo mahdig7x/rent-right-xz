@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { Check, X, Loader2 } from 'lucide-react';
+import { Check, X, Loader2, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function BookingRequestsPage() {
   const { t } = useI18n();
@@ -69,6 +70,11 @@ export default function BookingRequestsPage() {
                 <Badge variant={r.status === 'confirmed' ? 'default' : r.status === 'pending' ? 'secondary' : 'outline'}>
                   {t(`bookingStatus.${r.status}`)}
                 </Badge>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={`/messages?booking=${r.id}&user=${r.renter_id}`}>
+                    <MessageSquare className="me-1 h-3.5 w-3.5" />{t('messages.chat')}
+                  </Link>
+                </Button>
                 {r.status === 'pending' && (
                   <>
                     <Button size="sm" disabled={busyId === r.id} onClick={() => handleAction(r.id, 'confirmed')}>

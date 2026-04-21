@@ -417,6 +417,47 @@ export default function ItemDetailsPage() {
                 </div>
               </motion.div>
 
+              {/* Location Map */}
+              <motion.div variants={fadeUp}>
+                <h3 className="font-display text-lg font-semibold mb-3 flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-primary" />{t('details.locationMap')}
+                </h3>
+                <Card className="overflow-hidden border-2">
+                  <div className="aspect-[16/9] w-full bg-muted">
+                    <iframe
+                      title="map"
+                      src={
+                        item.latitude && item.longitude
+                          ? `https://maps.google.com/maps?q=${item.latitude},${item.longitude}&z=14&output=embed`
+                          : `https://maps.google.com/maps?q=${encodeURIComponent(item.location)}&z=12&output=embed`
+                      }
+                      className="h-full w-full border-0"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                  <div className="p-3 flex items-center justify-between bg-card">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      <span className="truncate">{item.location}</span>
+                    </div>
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={
+                          item.latitude && item.longitude
+                            ? `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`
+                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('details.openInMaps')}
+                      </a>
+                    </Button>
+                  </div>
+                </Card>
+              </motion.div>
+
               <Separator />
 
               {/* Owner */}

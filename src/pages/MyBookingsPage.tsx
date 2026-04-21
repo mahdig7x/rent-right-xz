@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import ReviewDialog from '@/components/ReviewDialog';
+import { Link } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
 
 export default function MyBookingsPage() {
   const { t } = useI18n();
@@ -44,6 +46,11 @@ export default function MyBookingsPage() {
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant={b.status === 'confirmed' ? 'default' : b.status === 'pending' ? 'secondary' : 'outline'}>{t(`bookingStatus.${b.status}`)}</Badge>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={`/messages?booking=${b.id}&user=${b.lessor_id}`}>
+                    <MessageSquare className="me-1 h-3.5 w-3.5" />{t('messages.chat')}
+                  </Link>
+                </Button>
                 {b.status === 'pending' && (
                   <Button variant="outline" size="sm" onClick={async () => {
                     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id);
