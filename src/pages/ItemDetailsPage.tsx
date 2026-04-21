@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ItemCard from '@/components/items/ItemCard';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/contexts/ChatContext';
+import PaymentForm from '@/components/PaymentForm';
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
@@ -156,7 +157,29 @@ export default function ItemDetailsPage() {
   const navigate = useNavigate();
   const { items } = useListings();
   const item = items.find(i => i.id === id);
-  const reviews: any[] = [];
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!item) return;
+    (async () => {
+      const { data: bks } = await supabase.from('bookings').select('id').eq('item_id', item.id);
+      const ids = (bks || []).map((b: any) => b.id);
+      if (ids.length === 0) { setReviews([]); return; }
+      const { data: rs } = await supabase.from('reviews').select('*').in('booking_id', ids).order('created_at', { ascending: false });
+      if (!rs) { setReviews([]); return; }
+      const reviewerIds = [...new Set(rs.map((r: any) => r.reviewer_id))];
+      const { data: profs } = await supabase.from('profiles').select('user_id, name, profile_image').in('user_id', reviewerIds);
+      const pmap = (profs || []).reduce((acc: any, p: any) => { acc[p.user_id] = p; return acc; }, {});
+      setReviews(rs.map((r: any) => ({
+        id: r.id,
+        rating: r.rating,
+        comment: r.comment,
+        reviewDate: r.created_at,
+        reviewerName: pmap[r.reviewer_id]?.name || 'مستخدم',
+        reviewerImage: pmap[r.reviewer_id]?.profile_image,
+      })));
+    })();
+  }, [item?.id]);
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [message, setMessage] = useState('');
@@ -214,7 +237,7 @@ export default function ItemDetailsPage() {
     if (days < 1) { toast({ title: t('details.invalidDates'), variant: 'destructive' }); return; }
 
     setBookingState('processing');
-    const { error } = await supabase.from('bookings').insert({
+    const { data: booking, error } = await supabase.from('bookings').insert({
       item_id: item.id,
       renter_id: user.id,
       lessor_id: item.owner_id,
@@ -222,12 +245,15 @@ export default function ItemDetailsPage() {
       end_date: dateRange.to.toISOString().split('T')[0],
       total_price: total,
       insurance_amount: insurance,
-    });
-    if (error) {
+      status: 'confirmed',
+    }).select().single();
+    if (error || !booking) {
       toast({ title: 'فشل في إنشاء الحجز', variant: 'destructive' });
       setBookingState('idle');
       return;
     }
+    // Record demo payments
+    await supabase.from('bookings').update({ status: 'confirmed' }).eq('id', booking.id);
     setBookingState('success');
   };
 
