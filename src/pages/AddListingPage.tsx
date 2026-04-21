@@ -144,7 +144,33 @@ export default function AddListingPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div><Label>{t('addListing.pricePerDay')} *</Label><Input type="number" placeholder="25" value={form.price_per_day} onChange={e => update('price_per_day', e.target.value)} /></div>
-            <div><Label>{t('addListing.location')}</Label><Input placeholder={t('addListing.location')} value={form.location} onChange={e => update('location', e.target.value)} /></div>
+            <div>
+              <Label className="flex items-center gap-1.5">
+                {t('addListing.location')} *
+                {locationVerified && <CheckCircle2 className="h-3.5 w-3.5 text-success" />}
+              </Label>
+              <Input
+                placeholder="الرياض، السعودية"
+                value={form.location}
+                onChange={e => { update('location', e.target.value); setLocationVerified(false); setCoords(null); }}
+              />
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button type="button" size="sm" variant="outline" onClick={detectLocation} disabled={locating} className="gap-1.5">
+                  {locating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MapPin className="h-3.5 w-3.5" />}
+                  موقعي الحالي
+                </Button>
+                {mapsUrl && (
+                  <a href={mapsUrl} target="_blank" rel="noreferrer">
+                    <Button type="button" size="sm" variant="ghost" className="gap-1.5">
+                      <ExternalLink className="h-3.5 w-3.5" /> معاينة على خرائط Google
+                    </Button>
+                  </a>
+                )}
+              </div>
+              {locationVerified && coords && (
+                <p className="mt-1 text-xs text-success flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> تم التحقق من الموقع تلقائياً</p>
+              )}
+            </div>
           </div>
           <div>
             <Label>{t('addListing.images')}</Label>
