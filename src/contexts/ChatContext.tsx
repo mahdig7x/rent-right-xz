@@ -51,16 +51,33 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: msgs } = await supabase
       .from('messages')
-      .select('*, sender:profiles!messages_sender_id_fkey(name, profile_image), receiver:profiles!messages_receiver_id_fkey(name, profile_image)')
+      .select('*')
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
 
     if (!msgs) { setLoading(false); return; }
 
+    // Get unique other user IDs
+    const otherIds = [...new Set(msgs.map(m => m.sender_id === user.id ? m.receiver_id : m.sender_id))];
+
+    let profilesMap: Record<string, { name: string; profile_image: string | null }> = {};
+    if (otherIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, name, profile_image')
+        .in('user_id', otherIds);
+      if (profilesData) {
+        profilesMap = profilesData.reduce((acc, p) => {
+          acc[p.user_id] = { name: p.name, profile_image: p.profile_image };
+          return acc;
+        }, {} as Record<string, { name: string; profile_image: string | null }>);
+      }
+    }
+
     const convMap = new Map<string, ChatConversation>();
     for (const msg of msgs as any[]) {
       const otherUserId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
-      const otherProfile = msg.sender_id === user.id ? msg.receiver : msg.sender;
+      const otherProfile = profilesMap[otherUserId];
       if (!convMap.has(otherUserId)) {
         convMap.set(otherUserId, {
           id: otherUserId,
@@ -107,7 +124,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return [];
     const { data } = await supabase
       .from('messages')
-      .select('*, sender:profiles!messages_sender_id_fkey(name, profile_image)')
+      .select('*')
       .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
       .order('created_at', { ascending: true });
 
@@ -118,10 +135,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .eq('receiver_id', user.id)
       .eq('read', false);
 
+    // Fetch sender profiles
+    const senderIds = [...new Set((data || []).map((m: any) => m.sender_id))];
+    let profilesMap: Record<string, { name: string; profile_image: string | null }> = {};
+    if (senderIds.length > 0) {
+      const { data: profs } = await supabase
+        .from('profiles')
+        .select('user_id, name, profile_image')
+        .in('user_id', senderIds);
+      if (profs) {
+        profilesMap = profs.reduce((acc, p) => {
+          acc[p.user_id] = { name: p.name, profile_image: p.profile_image };
+          return acc;
+        }, {} as Record<string, { name: string; profile_image: string | null }>);
+      }
+    }
+
     return (data || []).map((m: any) => ({
       ...m,
-      sender_name: m.sender?.name,
-      sender_image: m.sender?.profile_image,
+      sender_name: profilesMap[m.sender_id]?.name,
+      sender_image: profilesMap[m.sender_id]?.profile_image,
     }));
   }, [user]);
 

@@ -30,23 +30,37 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAdmin) return;
-    // Fetch stats
-    Promise.all([
-      supabase.from('profiles').select('id', { count: 'exact', head: true }),
-      supabase.from('items').select('id, title, moderation_status, created_at').order('created_at', { ascending: false }),
-      supabase.from('reports').select('*, profiles!reports_user_id_fkey(name)').order('created_at', { ascending: false }),
-    ]).then(([usersRes, itemsRes, reportsRes]) => {
+    (async () => {
+      const [usersRes, itemsRes, reportsRes] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('items').select('id, title, moderation_status, created_at').order('created_at', { ascending: false }),
+        supabase.from('reports').select('*').order('created_at', { ascending: false }),
+      ]);
       const allItems = itemsRes.data || [];
       const allReports = reportsRes.data || [];
+
+      // Fetch reporter profiles
+      const reporterIds = [...new Set(allReports.map((r: any) => r.user_id))];
+      let profilesMap: Record<string, string> = {};
+      if (reporterIds.length > 0) {
+        const { data: profs } = await supabase
+          .from('profiles')
+          .select('user_id, name')
+          .in('user_id', reporterIds);
+        if (profs) {
+          profilesMap = profs.reduce((acc, p) => { acc[p.user_id] = p.name; return acc; }, {} as Record<string, string>);
+        }
+      }
+
       setItems(allItems);
-      setReports(allReports);
+      setReports(allReports.map((r: any) => ({ ...r, profiles: { name: profilesMap[r.user_id] || 'مستخدم' } })));
       setStats({
         totalUsers: usersRes.count || 0,
         totalListings: allItems.length,
         pendingListings: allItems.filter((i: any) => i.moderation_status === 'pending_review').length,
         openReports: allReports.filter((r: any) => r.status === 'submitted' || r.status === 'under_review').length,
       });
-    });
+    })();
   }, [isAdmin]);
 
   if (isAdmin === null) return <div className="container py-32 text-center">{t('login.signing')}...</div>;
