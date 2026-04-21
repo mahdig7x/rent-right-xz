@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { Card } from '@/components/ui/card';
@@ -9,12 +10,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
-  const { profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile, loading: authLoading } = useAuth();
   const { t } = useI18n();
-  const [form, setForm] = useState({ name: profile?.name || '', phone: profile?.phone || '', location: profile?.location || '' });
+  const [form, setForm] = useState({ name: '', phone: '', location: '' });
   const [loading, setLoading] = useState(false);
 
-  if (!profile) return null;
+  useEffect(() => {
+    if (profile) setForm({ name: profile.name || '', phone: profile.phone || '', location: profile.location || '' });
+  }, [profile]);
+
+  if (authLoading) return <div className="container py-16 text-center text-muted-foreground">...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!profile) return <div className="container py-16 text-center text-muted-foreground">...</div>;
 
   const update = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
 
