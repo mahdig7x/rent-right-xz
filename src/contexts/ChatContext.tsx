@@ -27,8 +27,8 @@ export interface ChatConversation {
 interface ChatContextType {
   conversations: ChatConversation[];
   loading: boolean;
-  getMessages: (otherUserId: string) => Promise<ChatMessage[]>;
-  sendMessage: (receiverId: string, content: string) => Promise<boolean>;
+  getMessages: (otherUserId: string, bookingId?: string | null) => Promise<ChatMessage[]>;
+  sendMessage: (receiverId: string, content: string, bookingId?: string | null) => Promise<boolean>;
   totalUnread: number;
   refreshConversations: () => Promise<void>;
 }
