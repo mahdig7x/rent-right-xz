@@ -18,25 +18,46 @@ export default function MessagesPage() {
   const { user, isAuthenticated } = useAuth();
   const { conversations, getMessages, sendMessage } = useChat();
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
 
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(conversations[0]?.other_user_id || null);
+  const initialUser = params.get('user') || conversations[0]?.other_user_id || null;
+  const initialBooking = params.get('booking');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(initialUser);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(initialBooking);
+  const [bookingInfo, setBookingInfo] = useState<{ title: string; image?: string; status: string } | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMsg, setNewMsg] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showMobileChat, setShowMobileChat] = useState(false);
+  const [showMobileChat, setShowMobileChat] = useState(!!initialUser);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const convo = conversations.find(c => c.other_user_id === selectedUserId);
 
-  const loadMessages = useCallback(async (userId: string) => {
-    const msgs = await getMessages(userId);
+  const loadMessages = useCallback(async (userId: string, bookingId: string | null) => {
+    const msgs = await getMessages(userId, bookingId);
     setMessages(msgs);
   }, [getMessages]);
 
   useEffect(() => {
-    if (selectedUserId) loadMessages(selectedUserId);
-  }, [selectedUserId, loadMessages]);
+    if (selectedUserId) loadMessages(selectedUserId, selectedBookingId);
+  }, [selectedUserId, selectedBookingId, loadMessages]);
+
+  // Load booking info when bookingId is provided
+  useEffect(() => {
+    if (!selectedBookingId) { setBookingInfo(null); return; }
+    (async () => {
+      const { data } = await supabase
+        .from('bookings')
+        .select('status, items(title, images)')
+        .eq('id', selectedBookingId)
+        .maybeSingle();
+      if (data) {
+        const it: any = (data as any).items;
+        setBookingInfo({ title: it?.title || '', image: it?.images?.[0], status: (data as any).status });
+      }
+    })();
+  }, [selectedBookingId]);
 
   const filteredConvos = conversations.filter(c =>
     c.other_user_name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -55,9 +76,9 @@ export default function MessagesPage() {
   // Poll for new messages
   useEffect(() => {
     if (!selectedUserId) return;
-    const interval = setInterval(() => loadMessages(selectedUserId), 5000);
+    const interval = setInterval(() => loadMessages(selectedUserId, selectedBookingId), 5000);
     return () => clearInterval(interval);
-  }, [selectedUserId, loadMessages]);
+  }, [selectedUserId, selectedBookingId, loadMessages]);
 
   if (!isAuthenticated) {
     return (
@@ -72,16 +93,19 @@ export default function MessagesPage() {
 
   const handleSend = async () => {
     if (!newMsg.trim() || !selectedUserId) return;
-    const ok = await sendMessage(selectedUserId, newMsg);
+    const ok = await sendMessage(selectedUserId, newMsg, selectedBookingId);
     if (ok) {
       setNewMsg('');
-      await loadMessages(selectedUserId);
+      await loadMessages(selectedUserId, selectedBookingId);
       inputRef.current?.focus();
     }
   };
 
   const selectConvo = (userId: string) => {
     setSelectedUserId(userId);
+    setSelectedBookingId(null);
+    setBookingInfo(null);
+    setParams({}, { replace: true });
     setShowMobileChat(true);
   };
 
