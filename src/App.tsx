@@ -37,35 +37,35 @@ const App = () => (
         <AuthProvider>
           <ChatProvider>
             <ListingsProvider>
-            <NotificationsProvider>
-            <BrowserRouter>
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <main className="flex-1">
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/browse" element={<BrowsePage />} />
-                    <Route path="/nearby" element={<NearbyPage />} />
-                    <Route path="/items/:id" element={<ItemDetailsPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/listings/new" element={<AddListingPage />} />
-                    <Route path="/listings/:id/edit" element={<EditListingPage />} />
-                    <Route path="/my-listings" element={<MyListingsPage />} />
-                    <Route path="/my-bookings" element={<MyBookingsPage />} />
-                    <Route path="/booking-requests" element={<BookingRequestsPage />} />
-                    <Route path="/messages" element={<MessagesPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/report" element={<ReportPage />} />
-                    <Route path="/admin" element={<AdminPage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-                <Footer />
-              </div>
-            </BrowserRouter>
-            </NotificationsProvider>
+              <NotificationsProvider>
+                <BrowserRouter>
+                  <div className="flex min-h-screen flex-col">
+                    <Navbar />
+                    <main className="flex-1">
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/browse" element={<BrowsePage />} />
+                        <Route path="/nearby" element={<NearbyPage />} />
+                        <Route path="/items/:id" element={<ItemDetailsPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/dashboard" element={<DashboardPage />} />
+                        <Route path="/listings/new" element={<AddListingPage />} />
+                        <Route path="/listings/:id/edit" element={<EditListingPage />} />
+                        <Route path="/my-listings" element={<MyListingsPage />} />
+                        <Route path="/my-bookings" element={<MyBookingsPage />} />
+                        <Route path="/booking-requests" element={<BookingRequestsPage />} />
+                        <Route path="/messages" element={<MessagesPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/report" element={<ReportPage />} />
+                        <Route path="/admin" element={<AdminPage />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </div>
+                </BrowserRouter>
+              </NotificationsProvider>
             </ListingsProvider>
           </ChatProvider>
         </AuthProvider>
