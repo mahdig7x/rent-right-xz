@@ -314,6 +314,51 @@ export const translations: Record<Locale, Record<string, string>> = {
     'footer.insurancePolicy': 'Insurance Policy',
     'footer.rights': 'All rights reserved.',
 
+    // Booking status
+    'bookingStatus.pending': 'Pending',
+    'bookingStatus.confirmed': 'Confirmed',
+    'bookingStatus.rejected': 'Rejected',
+    'bookingStatus.cancelled': 'Cancelled',
+    'bookingStatus.completed': 'Completed',
+    'bookingStatus.failed': 'Failed',
+
+    // Reviews
+    'review.leave': 'Leave a Review',
+    'review.title': 'Rate your experience',
+    'review.commentPlaceholder': 'Share your experience...',
+    'review.submit': 'Submit Review',
+    'review.submitted': 'Thank you! Your review was submitted.',
+    'review.failed': 'Failed to submit review',
+    'review.pickRating': 'Please select a rating',
+
+    // Payment
+    'pay.testMode': 'Test Mode',
+    'pay.cardNumber': 'Card number',
+    'pay.cardholderName': 'Cardholder name',
+    'pay.cardholder': 'CARDHOLDER',
+    'pay.namePlaceholder': 'Name on card',
+    'pay.expiry': 'Expiry',
+    'pay.payNow': 'Pay',
+    'pay.processing': 'Processing payment...',
+    'pay.testHint': 'Test mode — no real charge will be made.',
+    'pay.invalidCard': 'Invalid card number',
+    'pay.nameRequired': 'Cardholder name is required',
+    'pay.invalidExpiry': 'Invalid expiry date',
+    'pay.invalidCvc': 'Invalid CVC',
+
+    // Edit
+    'edit.title': 'Edit Listing',
+    'edit.save': 'Save Changes',
+    'edit.updated': 'Listing updated',
+    'edit.failed': 'Failed to update listing',
+    'edit.notOwner': 'You do not own this listing',
+
+    // Notifications
+    'notif.newMessage': 'New message',
+    'notif.newBooking': 'New booking request',
+    'notif.newBookingDesc': 'You have a new booking request to review.',
+    'notif.bookingUpdate': 'Booking updated',
+
     // Language
     'lang.switch': 'العربية',
   },
