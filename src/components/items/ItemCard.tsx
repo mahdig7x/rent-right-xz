@@ -1,4 +1,3 @@
-import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +9,7 @@ interface Props {
   item: ListingItem;
 }
 
-const ItemCard = forwardRef<HTMLAnchorElement, Props>(({ item }, ref) => {
+export default function ItemCard({ item }: Props) {
   const { t } = useI18n();
 
   const conditionLabel = t(`item.${item.condition}`);
@@ -18,7 +17,7 @@ const ItemCard = forwardRef<HTMLAnchorElement, Props>(({ item }, ref) => {
   const categoryLabel = t(`cat.${item.category}`);
 
   return (
-    <Link ref={ref} to={`/items/${item.id}`}>
+    <Link to={`/items/${item.id}`} className="block">
       <Card className="group overflow-hidden border bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1">
         <div className="relative aspect-[4/3] overflow-hidden">
           <img src={item.images?.[0]} alt={item.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
@@ -42,8 +41,4 @@ const ItemCard = forwardRef<HTMLAnchorElement, Props>(({ item }, ref) => {
       </Card>
     </Link>
   );
-});
-
-ItemCard.displayName = 'ItemCard';
-
-export default ItemCard;
+}
