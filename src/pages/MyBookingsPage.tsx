@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import ReviewDialog from '@/components/ReviewDialog';
+import { Link } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
 
 export default function MyBookingsPage() {
   const { t } = useI18n();
