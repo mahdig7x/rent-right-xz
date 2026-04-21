@@ -52,7 +52,7 @@ export default function DashboardPage() {
     <div className="container py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold">{t('dash.welcome')} {profile.name.split(' ')[0]}</h1>
+          <h1 className="font-display text-2xl font-bold">{t('dash.welcome')} {displayName.split(' ')[0]}</h1>
           <p className="text-sm text-muted-foreground">{t('dash.subtitle')}</p>
         </div>
         <Link to="/listings/new"><Button><Plus className="me-1.5 h-4 w-4" />{t('nav.listItem')}</Button></Link>
