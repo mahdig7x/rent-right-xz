@@ -86,6 +86,19 @@ export default function LoginPage() {
           <div><Label htmlFor="password">{t('login.password')}</Label><Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} /></div>
           <Button type="submit" className="w-full" disabled={loading}>{loading ? t('login.signing') : t('login.submit')}</Button>
         </form>
+        {needsConfirm && (
+          <div className="mt-4 rounded-lg border border-warning/40 bg-warning/10 p-3 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
+            <div className="flex-1 text-sm">
+              <p className="font-medium">بريدك الإلكتروني لم يُؤكَّد بعد</p>
+              <p className="text-xs text-muted-foreground mt-0.5">افتح الرسالة المرسلة إلى <span className="font-medium">{email}</span> واضغط على الرابط، أو أعد إرسالها:</p>
+              <Button size="sm" variant="outline" className="mt-2 gap-1.5" onClick={resendConfirmation} disabled={resending}>
+                {resending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                إعادة إرسال رسالة التأكيد
+              </Button>
+            </div>
+          </div>
+        )}
         <p className="mt-6 text-center text-sm text-muted-foreground">
           {t('login.noAccount')} <Link to="/register" className="font-medium text-primary hover:underline">{t('nav.signup')}</Link>
         </p>
