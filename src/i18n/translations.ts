@@ -674,6 +674,24 @@ export const translations: Record<Locale, Record<string, string>> = {
     'messages.yesterday': 'أمس',
     'messages.startChat': 'ابدأ المحادثة بإرسال رسالة.',
     'messages.loginRequired': 'يرجى تسجيل الدخول لعرض رسائلك.',
+    'messages.chat': 'محادثة',
+    'messages.bookingChat': 'محادثة الحجز',
+    'messages.aboutBooking': 'حول الحجز',
+
+    // Nearby
+    'nearby.title': 'ابحث عن إعلانات قريبة منك',
+    'nearby.subtitle': 'استكشف الأغراض على الخريطة. اضغط على أي علامة للاطلاع والإيجار.',
+    'nearby.searchCity': 'ابحث عن مدينة أو عنوان...',
+    'nearby.useMyLocation': 'استخدم موقعي',
+    'nearby.radius': 'نطاق البحث',
+    'nearby.noResults': 'لا توجد إعلانات في هذا النطاق.',
+    'nearby.locating': 'جاري تحديد مواقع الإعلانات...',
+    'nearby.youAreHere': 'أنت هنا',
+    'nearby.viewListing': 'عرض الإعلان',
+
+    // Item Details — Map
+    'details.locationMap': 'الموقع على الخريطة',
+    'details.openInMaps': 'افتح في خرائط جوجل',
 
     // Scenario
     'scenario.homeTitle': 'عندك شغل في البيت؟ 🔨',
