@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe } from 'lucide-react';
+import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import logo from '@/assets/logo.png';
 
@@ -30,6 +30,7 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-1 md:flex">
           <Link to="/browse"><Button variant="ghost" size="sm">{t('nav.browse')}</Button></Link>
+          <Link to="/nearby"><Button variant="ghost" size="sm"><MapPin className="me-1.5 h-4 w-4" />{t('nav.nearby')}</Button></Link>
           {isAuthenticated && (
             <>
               <Link to="/dashboard"><Button variant="ghost" size="sm"><LayoutDashboard className="me-1.5 h-4 w-4" />{t('nav.dashboard')}</Button></Link>
@@ -81,6 +82,7 @@ export default function Navbar() {
             <SheetContent side={locale === 'ar' ? 'left' : 'right'} className="w-72">
               <nav className="mt-8 flex flex-col gap-2">
                 <Link to="/browse" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.browse')}</Button></Link>
+                <Link to="/nearby" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.nearby')}</Button></Link>
                 {isAuthenticated ? (
                   <>
                     <Link to="/dashboard" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.dashboard')}</Button></Link>
