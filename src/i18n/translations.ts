@@ -675,6 +675,51 @@ export const translations: Record<Locale, Record<string, string>> = {
     'footer.insurancePolicy': 'سياسة التأمين',
     'footer.rights': 'جميع الحقوق محفوظة.',
 
+    // Booking status
+    'bookingStatus.pending': 'قيد الانتظار',
+    'bookingStatus.confirmed': 'مؤكد',
+    'bookingStatus.rejected': 'مرفوض',
+    'bookingStatus.cancelled': 'ملغي',
+    'bookingStatus.completed': 'مكتمل',
+    'bookingStatus.failed': 'فشل',
+
+    // Reviews
+    'review.leave': 'اترك تقييماً',
+    'review.title': 'قيّم تجربتك',
+    'review.commentPlaceholder': 'شاركنا تجربتك...',
+    'review.submit': 'إرسال التقييم',
+    'review.submitted': 'شكراً لك! تم إرسال تقييمك.',
+    'review.failed': 'فشل في إرسال التقييم',
+    'review.pickRating': 'يرجى اختيار تقييم',
+
+    // Payment
+    'pay.testMode': 'وضع تجريبي',
+    'pay.cardNumber': 'رقم البطاقة',
+    'pay.cardholderName': 'اسم حامل البطاقة',
+    'pay.cardholder': 'حامل البطاقة',
+    'pay.namePlaceholder': 'الاسم كما يظهر على البطاقة',
+    'pay.expiry': 'تاريخ الانتهاء',
+    'pay.payNow': 'ادفع',
+    'pay.processing': 'جاري معالجة الدفع...',
+    'pay.testHint': 'وضع تجريبي — لن يتم خصم أي مبلغ حقيقي.',
+    'pay.invalidCard': 'رقم بطاقة غير صحيح',
+    'pay.nameRequired': 'اسم حامل البطاقة مطلوب',
+    'pay.invalidExpiry': 'تاريخ انتهاء غير صحيح',
+    'pay.invalidCvc': 'رمز CVC غير صحيح',
+
+    // Edit
+    'edit.title': 'تعديل الإعلان',
+    'edit.save': 'حفظ التغييرات',
+    'edit.updated': 'تم تحديث الإعلان',
+    'edit.failed': 'فشل في تحديث الإعلان',
+    'edit.notOwner': 'هذا الإعلان ليس ملكك',
+
+    // Notifications
+    'notif.newMessage': 'رسالة جديدة',
+    'notif.newBooking': 'طلب حجز جديد',
+    'notif.newBookingDesc': 'لديك طلب حجز جديد للمراجعة.',
+    'notif.bookingUpdate': 'تحديث الحجز',
+
     // Language
     'lang.switch': 'English',
   },
