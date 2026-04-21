@@ -47,7 +47,7 @@ export default function HomePage() {
     (async () => {
       const [itemsRes, usersRes, reviewsRes] = await Promise.all([
         supabase.from('items').select('id', { count: 'exact', head: true }).eq('moderation_status', 'approved'),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        (supabase as any).from('profiles_public').select('id', { count: 'exact', head: true }),
         supabase.from('reviews').select('rating'),
       ]);
       const ratings = reviewsRes.data || [];
