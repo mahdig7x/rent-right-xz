@@ -103,6 +103,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
       .insert({
         ...data,
         owner_id: user.id,
+        moderation_status: 'approved',
       })
       .select()
       .single();
