@@ -666,17 +666,7 @@ export default function ItemDetailsPage() {
                                 <Separator />
                                 <div className="flex justify-between font-display font-bold text-base"><span>{t('details.total')}</span><span className="text-primary">${total + insurance}</span></div>
                               </div>
-                              <Button
-                                className="w-full h-12 text-base font-semibold rounded-xl"
-                                onClick={handleBook}
-                                disabled={bookingState === 'processing'}
-                              >
-                                {bookingState === 'processing' ? (
-                                  <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t('details.processing')}</>
-                                ) : (
-                                  <><CreditCard className="me-2 h-5 w-5" />{t('details.confirmPay')} ${total + insurance}</>
-                                )}
-                              </Button>
+                              <PaymentForm amount={total + insurance} onSuccess={handleBook} loading={bookingState === 'processing'} />
                               <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
                                 <Shield className="h-3 w-3" />{t('details.secureCheckout')}
                               </p>
