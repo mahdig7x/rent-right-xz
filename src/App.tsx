@@ -11,6 +11,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import HomePage from "@/pages/HomePage";
 import BrowsePage from "@/pages/BrowsePage";
+import NearbyPage from "@/pages/NearbyPage";
 import ItemDetailsPage from "@/pages/ItemDetailsPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
