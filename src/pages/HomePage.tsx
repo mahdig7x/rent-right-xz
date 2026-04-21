@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import ItemCard from '@/components/items/ItemCard';
 import ScenarioSection from '@/components/home/ScenarioSection';
+import UseCasesSection from '@/components/home/UseCasesSection';
 import { useListings } from '@/contexts/ListingsContext';
 import { CATEGORIES } from '@/types';
 import {
@@ -213,6 +214,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Real Use Cases */}
+      <UseCasesSection />
 
       {/* Scenario: Home Renovation */}
       <ScenarioSection scenarioId="home_renovation" />
