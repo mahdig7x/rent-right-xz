@@ -7,16 +7,25 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin, Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo-full.png';
 
 export default function Navbar() {
-  const { isAuthenticated, profile, logout } = useAuth();
+  const { isAuthenticated, profile, logout, user } = useAuth();
   const { t, locale, setLocale } = useI18n();
   const { totalUnread } = useChat();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').then(({ data }) => {
+      setIsAdmin(!!data && data.length > 0);
+    });
+  }, [user]);
 
   const toggleLang = () => setLocale(locale === 'en' ? 'ar' : 'en');
 
@@ -44,6 +53,9 @@ export default function Navbar() {
                 )}
               </Link>
               <Link to="/listings/new"><Button size="sm" className="ms-2"><Plus className="me-1.5 h-4 w-4" />{t('nav.listItem')}</Button></Link>
+              {isAdmin && (
+                <Link to="/admin"><Button variant="outline" size="sm" className="ms-1 gap-1.5"><Shield className="h-4 w-4" />Admin</Button></Link>
+              )}
             </>
           )}
         </nav>
@@ -67,6 +79,7 @@ export default function Navbar() {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => navigate('/profile')}><UserIcon className="me-2 h-4 w-4" />{t('nav.profile')}</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/dashboard')}><LayoutDashboard className="me-2 h-4 w-4" />{t('nav.dashboard')}</DropdownMenuItem>
+                {isAdmin && <DropdownMenuItem onClick={() => navigate('/admin')}><Shield className="me-2 h-4 w-4" />Admin</DropdownMenuItem>}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => { logout(); navigate('/'); }}><LogOut className="me-2 h-4 w-4" />{t('nav.logout')}</DropdownMenuItem>
               </DropdownMenuContent>
@@ -91,6 +104,7 @@ export default function Navbar() {
                     <Link to="/dashboard" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.dashboard')}</Button></Link>
                     <Link to="/messages" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.messages')}</Button></Link>
                     <Link to="/listings/new" onClick={() => setOpen(false)}><Button className="w-full justify-start">{t('nav.listItem')}</Button></Link>
+                    {isAdmin && <Link to="/admin" onClick={() => setOpen(false)}><Button variant="outline" className="w-full justify-start gap-2"><Shield className="h-4 w-4" />Admin</Button></Link>}
                     <Link to="/profile" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.profile')}</Button></Link>
                     <Button variant="ghost" className="w-full justify-start" onClick={() => { logout(); navigate('/'); setOpen(false); }}>{t('nav.logout')}</Button>
                   </>
