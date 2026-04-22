@@ -28,7 +28,7 @@ export default function MessagesPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMsg, setNewMsg] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showMobileChat, setShowMobileChat] = useState(!!initialUser);
+  const [showMobileChat, setShowMobileChat] = useState(!!params.get('user'));
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
