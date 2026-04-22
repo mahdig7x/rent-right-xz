@@ -195,18 +195,18 @@ export default function HomePage() {
             <p className="mt-3 text-muted-foreground">{t('home.categorySubtitle')}</p>
           </motion.div>
 
-          {/* Mobile: horizontal scroll list */}
-          <div className="sm:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-            <div className="flex gap-3 pb-2 w-max">
+          {/* Mobile & Tablet: horizontal scroll list */}
+          <div className="lg:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+            <div className="flex gap-3 sm:gap-4 pb-2 w-max">
               {CATEGORIES.map(cat => {
                 const Icon = CATEGORY_ICONS[cat] || Package;
                 return (
                   <Link key={cat} to={`/browse?category=${encodeURIComponent(cat)}`} className="snap-start shrink-0">
-                    <Card className="group flex flex-col items-center justify-center gap-2 p-3 w-20 h-24 border-2 border-transparent hover:border-primary/30 transition-all duration-300 active:scale-95">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                        <Icon className="h-5 w-5 text-primary" />
+                    <Card className="group flex flex-col items-center justify-center gap-2 p-3 sm:p-4 w-20 h-24 sm:w-24 sm:h-28 border-2 border-transparent hover:border-primary/30 transition-all duration-300 active:scale-95">
+                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                       </div>
-                      <span className="font-display text-[11px] font-semibold leading-tight text-center line-clamp-2">{t(`cat.${cat}`)}</span>
+                      <span className="font-display text-[11px] sm:text-xs font-semibold leading-tight text-center line-clamp-2">{t(`cat.${cat}`)}</span>
                     </Card>
                   </Link>
                 );
@@ -214,8 +214,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Tablet/Desktop: equal-height grid */}
-          <div className="hidden sm:grid grid-cols-3 md:grid-cols-5 gap-4 auto-rows-fr items-stretch">
+          {/* Desktop: equal-height grid */}
+          <div className="hidden lg:grid grid-cols-5 gap-4 auto-rows-fr items-stretch">
             {CATEGORIES.map(cat => {
               const Icon = CATEGORY_ICONS[cat] || Package;
               return (
