@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Loader2, LocateFixed, Search } from 'lucide-react';
 
 const defaultIcon = L.icon({
@@ -161,6 +162,7 @@ export default function NearbyPage() {
   const [userLoc, setUserLoc] = useState<[number, number] | null>(null);
   const [radiusKm, setRadiusKm] = useState(50);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<string>('all');
   const [geocoding, setGeocoding] = useState(true);
   const [coords, setCoords] = useState<Record<string, [number, number]>>({});
   const [locating, setLocating] = useState(false);
@@ -240,9 +242,14 @@ export default function NearbyPage() {
     if (locationCoords) setCenter(locationCoords);
   };
 
+  const categories = useMemo(() => {
+    return Array.from(new Set(items.map((i) => i.category).filter(Boolean))).sort();
+  }, [items]);
+
   const itemsWithCoords = useMemo(() => {
     return items
       .filter((item) => coords[item.id])
+      .filter((item) => category === 'all' || item.category === category)
       .map((item) => {
         const coord = coords[item.id];
         const distance = userLoc ? haversine(userLoc, coord) : haversine(center, coord);
@@ -250,7 +257,7 @@ export default function NearbyPage() {
       })
       .filter((entry) => entry.distance <= radiusKm)
       .sort((a, b) => a.distance - b.distance);
-  }, [items, coords, userLoc, center, radiusKm]);
+  }, [items, coords, userLoc, center, radiusKm, category]);
 
   useEffect(() => {
     if (!mapElementRef.current || mapRef.current) return;
@@ -366,6 +373,21 @@ export default function NearbyPage() {
               {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
               {t('nearby.useMyLocation')}
             </Button>
+
+            <div>
+              <label className="text-xs text-muted-foreground mb-2 block">{t('nearby.category')}</label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('nearby.allCategories')}</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>{t(`cat.${c}`) !== `cat.${c}` ? t(`cat.${c}`) : c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div>
               <div className="flex justify-between text-xs mb-2">

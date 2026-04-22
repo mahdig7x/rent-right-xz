@@ -258,6 +258,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nearby.locating': 'Locating items on the map...',
     'nearby.youAreHere': 'You are here',
     'nearby.viewListing': 'View Listing',
+    'nearby.category': 'Category',
+    'nearby.allCategories': 'All categories',
 
     // Item Details — Map
     'details.locationMap': 'Location on Map',
@@ -688,6 +690,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nearby.locating': 'جاري تحديد مواقع الإعلانات...',
     'nearby.youAreHere': 'أنت هنا',
     'nearby.viewListing': 'عرض الإعلان',
+    'nearby.category': 'التصنيف',
+    'nearby.allCategories': 'كل التصنيفات',
 
     // Item Details — Map
     'details.locationMap': 'الموقع على الخريطة',
