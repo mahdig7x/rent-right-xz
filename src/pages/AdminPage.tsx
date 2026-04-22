@@ -9,8 +9,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Navigate, Link } from 'react-router-dom';
 import {
-  Users, Package, AlertTriangle, Shield,
-  Eye, CheckCircle2, Flag, Ban, X, ShieldCheck, ShieldOff, Crown
+  Users, AlertTriangle, Shield,
+  CheckCircle2, X, ShieldCheck, ShieldOff, Crown
 } from 'lucide-react';
 
 type UserRow = {
