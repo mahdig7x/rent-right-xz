@@ -42,7 +42,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           <Link to="/browse"><Button variant="ghost" size="sm">{t('nav.browse')}</Button></Link>
           <Link to="/nearby"><Button variant="ghost" size="sm"><MapPin className="me-1.5 h-4 w-4" />{t('nav.nearby')}</Button></Link>
           {isAuthenticated && (
