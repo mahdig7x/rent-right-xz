@@ -306,10 +306,10 @@ export default function ItemDetailsPage() {
           </div>
         </div>
 
-        <div className="container py-6 md:py-8">
-          <div className="grid gap-8 lg:grid-cols-5">
+        <div className="container px-3 sm:px-4 py-4 md:py-8">
+          <div className="grid gap-6 md:gap-8 lg:grid-cols-5">
             {/* Left: Images + Details */}
-            <div className="lg:col-span-3 space-y-8">
+            <div className="lg:col-span-3 space-y-6 md:space-y-8 min-w-0">
               {/* Image Gallery */}
               <motion.div variants={fadeUp}>
                 <div className="relative group overflow-hidden rounded-2xl aspect-[16/10] bg-muted cursor-pointer" onClick={() => setLightboxOpen(true)}>
@@ -554,7 +554,7 @@ export default function ItemDetailsPage() {
             {/* Right: Booking Sidebar */}
             <div className="lg:col-span-2">
               <motion.div variants={fadeUp}>
-                <Card className="sticky top-24 p-6 space-y-5 shadow-card-hover border-2">
+                <Card className="lg:sticky lg:top-24 p-5 md:p-6 space-y-5 shadow-card-hover border-2">
                   {/* Price Header */}
                   <div className="flex items-end justify-between">
                     <div>
