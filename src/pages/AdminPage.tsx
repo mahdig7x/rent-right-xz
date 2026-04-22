@@ -391,6 +391,76 @@ export default function AdminPage() {
           </div>
         )}
       </Card>
+
+      <Sheet open={!!itemsUser} onOpenChange={(o) => !o && setItemsUser(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>{t('admin.userItems')} — {itemsUser?.name}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-3">
+            {itemsLoading ? (
+              <p className="text-sm text-muted-foreground text-center py-6">{t('admin.loading')}</p>
+            ) : userItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUserItems')}</p>
+            ) : (
+              userItems.map((it) => {
+                const suspended = it.moderation_status === 'suspended';
+                return (
+                  <div key={it.id} className="rounded-lg border p-3 flex gap-3">
+                    {it.images?.[0] ? (
+                      <img src={it.images[0]} alt="" className="h-14 w-14 rounded object-cover" />
+                    ) : (
+                      <div className="h-14 w-14 rounded bg-muted flex items-center justify-center">
+                        <Package className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold truncate">{it.title}</p>
+                      <p className="text-xs text-muted-foreground">{it.category} · {it.price_per_day}</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <Badge variant={suspended ? 'destructive' : 'secondary'} className="text-xs">
+                          {it.moderation_status}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {suspended ? (
+                          <Button size="sm" variant="outline" onClick={() => reactivateItem(it)}>
+                            <RotateCcw className="me-1 h-3.5 w-3.5" />
+                            {t('admin.itemReactivate')}
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="secondary" onClick={() => suspendItem(it)}>
+                            <Ban className="me-1 h-3.5 w-3.5" />
+                            {t('admin.itemSuspend')}
+                          </Button>
+                        )}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="destructive">
+                              <Trash2 className="me-1 h-3.5 w-3.5" />
+                              {t('admin.itemDelete')}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{t('admin.itemDelete')}</AlertDialogTitle>
+                              <AlertDialogDescription>{t('admin.itemDeleteConfirm')}</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => removeItem(it)}>{t('admin.itemDelete')}</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
