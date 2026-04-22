@@ -90,14 +90,14 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden gap-2 md:flex">
+            <div className="hidden gap-2 lg:flex">
               <Link to="/login"><Button variant="ghost" size="sm">{t('nav.login')}</Button></Link>
               <Link to="/register"><Button size="sm">{t('nav.signup')}</Button></Link>
             </div>
           )}
 
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /></Button>
             </SheetTrigger>
             <SheetContent side={locale === 'ar' ? 'left' : 'right'} className="w-72">
