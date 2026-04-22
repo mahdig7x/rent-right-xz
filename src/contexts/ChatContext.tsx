@@ -116,6 +116,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }, () => {
         fetchConversations();
       })
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `sender_id=eq.${user.id}`,
+      }, () => {
+        fetchConversations();
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${user.id}`,
+      }, () => {
+        fetchConversations();
+      })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
