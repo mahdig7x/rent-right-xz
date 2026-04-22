@@ -17,15 +17,17 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const pendingEmail = searchParams.get('pending');
-  const [email, setEmail] = useState(pendingEmail || '');
+  const prefillEmail = searchParams.get('email');
+  const initialEmail = pendingEmail || prefillEmail || '';
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(!!pendingEmail);
   const [resending, setResending] = useState(false);
 
   useEffect(() => {
-    if (pendingEmail) setEmail(pendingEmail);
-  }, [pendingEmail]);
+    if (initialEmail) setEmail(initialEmail);
+  }, [initialEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
