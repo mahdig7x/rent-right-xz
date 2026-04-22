@@ -240,36 +240,6 @@ export default function AdminPage() {
         )}
       </Card>
 
-      <Card className="p-6 mb-6">
-        <h2 className="font-display text-lg font-semibold mb-4">{t('admin.itemsToReview')}</h2>
-        {pendingItems.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noItems')}</p>
-        ) : (
-          <div className="space-y-3">
-            {pendingItems.map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between rounded-lg border p-4 flex-wrap gap-3">
-                <div className="min-w-0">
-                  <Link to={`/items/${item.id}`} className="font-semibold text-sm hover:underline">{item.title}</Link>
-                  <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
-                  <Badge variant="outline" className="text-[10px] mt-1">{item.moderation_status}</Badge>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  <Button size="sm" onClick={() => handleItemAction(item, 'approved')}>
-                    <CheckCircle2 className="me-1 h-4 w-4" />{t('admin.approve')}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => handleItemAction(item, 'flagged')}>
-                    <Flag className="me-1 h-4 w-4" />{t('admin.flag')}
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleItemAction(item, 'suspended')}>
-                    <Ban className="me-1 h-4 w-4" />{t('admin.suspend')}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
       <Card className="p-6">
         <h2 className="font-display text-lg font-semibold mb-4">{t('admin.reports')}</h2>
         {reports.length === 0 ? (
