@@ -23,15 +23,23 @@ export default function RegisterPage() {
     if (form.password.length < 6) { toast({ title: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل', variant: 'destructive' }); return; }
     setLoading(true);
     const result = await register(form);
+    if (!result.success) {
+      setLoading(false);
+      toast({ title: result.error || 'Registration failed', variant: 'destructive' });
+      return;
+    }
+    // Auto-login after signup (email auto-confirm enabled)
+    const loginRes = await (await import('@/integrations/supabase/client')).supabase.auth.signInWithPassword({
+      email: form.email,
+      password: form.password,
+    });
     setLoading(false);
-    if (result.success) {
-      toast({
-        title: 'تم إنشاء حسابك ✅',
-        description: 'أرسلنا رسالة تأكيد إلى بريدك. اضغط الرابط داخلها ثم سجّل الدخول. أو استخدم Google لتسجيل دخول مباشر دون تأكيد.',
-      });
+    if (loginRes.error) {
+      toast({ title: 'تم إنشاء حسابك ✅', description: 'الرجاء تسجيل الدخول الآن.' });
       navigate('/login');
     } else {
-      toast({ title: result.error || 'Registration failed', variant: 'destructive' });
+      toast({ title: 'مرحباً بك 👋', description: 'تم إنشاء حسابك وتسجيل دخولك.' });
+      navigate('/dashboard');
     }
   };
 
