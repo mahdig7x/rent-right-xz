@@ -28,19 +28,51 @@ export default function RegisterPage() {
       toast({ title: result.error || 'Registration failed', variant: 'destructive' });
       return;
     }
-    // Auto-login after signup (email auto-confirm enabled)
-    const loginRes = await (await import('@/integrations/supabase/client')).supabase.auth.signInWithPassword({
+
+    // If signup returned a session → user is fully confirmed and active. Already logged in.
+    if (result.hasSession) {
+      setLoading(false);
+      toast({ title: 'مرحباً بك 👋', description: 'تم إنشاء حسابك وتسجيل دخولك.' });
+      navigate('/dashboard');
+      return;
+    }
+
+    // No session → try to sign in to detect the real account state
+    const { supabase } = await import('@/integrations/supabase/client');
+    const loginRes = await supabase.auth.signInWithPassword({
       email: form.email,
       password: form.password,
     });
     setLoading(false);
+
     if (loginRes.error) {
-      toast({ title: 'تم إنشاء حسابك ✅', description: 'الرجاء تسجيل الدخول الآن.' });
-      navigate('/login');
-    } else {
-      toast({ title: 'مرحباً بك 👋', description: 'تم إنشاء حسابك وتسجيل دخولك.' });
-      navigate('/dashboard');
+      const msg = loginRes.error.message.toLowerCase();
+      if (msg.includes('not confirmed') || msg.includes('email_not_confirmed')) {
+        toast({
+          title: 'يرجى تأكيد بريدك الإلكتروني ✉️',
+          description: `أرسلنا رسالة تأكيد إلى ${form.email}. افتحها واضغط الرابط ثم سجّل الدخول.`,
+        });
+        navigate(`/login?pending=${encodeURIComponent(form.email)}`);
+      } else {
+        toast({ title: loginRes.error.message, variant: 'destructive' });
+      }
+      return;
     }
+
+    // Session returned but verify confirmation status before sending to dashboard
+    const isConfirmed = !!loginRes.data.user?.email_confirmed_at || !!(loginRes.data.user as any)?.confirmed_at;
+    if (!isConfirmed) {
+      await supabase.auth.signOut();
+      toast({
+        title: 'يرجى تأكيد بريدك الإلكتروني ✉️',
+        description: `أرسلنا رسالة تأكيد إلى ${form.email}. افتحها واضغط الرابط ثم سجّل الدخول.`,
+      });
+      navigate(`/login?pending=${encodeURIComponent(form.email)}`);
+      return;
+    }
+
+    toast({ title: 'مرحباً بك 👋', description: 'تم إنشاء حسابك وتسجيل دخولك.' });
+    navigate('/dashboard');
   };
 
   return (
