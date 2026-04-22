@@ -13,11 +13,19 @@ import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo-full.png';
 
 export default function Navbar() {
-  const { isAuthenticated, profile, logout } = useAuth();
+  const { isAuthenticated, profile, logout, user } = useAuth();
   const { t, locale, setLocale } = useI18n();
   const { totalUnread } = useChat();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').then(({ data }) => {
+      setIsAdmin(!!data && data.length > 0);
+    });
+  }, [user]);
 
   const toggleLang = () => setLocale(locale === 'en' ? 'ar' : 'en');
 
