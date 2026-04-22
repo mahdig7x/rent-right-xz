@@ -449,7 +449,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     // Home
     'home.badge': 'الطريقة الأذكى للإيجار',
     'home.title1': 'استأجر اللي تبيه',
-    'home.title2': 'وأجــــر اللي عنـــــــدك',
+    'home.title2': 'وأجِّر اللي عندك',
     'home.subtitle': 'احصل على الأدوات والمعدات والإلكترونيات والمزيد من أشخاص بالقرب منك — بدون شراء.',
     'home.searchPlaceholder': 'ابحث عن أغراض...',
     'home.search': 'بحث',
