@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const { register, loginWithGoogle } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', location: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
   const [loading, setLoading] = useState(false);
   const update = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
 
@@ -59,7 +59,6 @@ export default function RegisterPage() {
           <div><Label htmlFor="email">{t('register.email')} *</Label><Input id="email" type="email" placeholder="you@example.com" value={form.email} onChange={e => update('email', e.target.value)} /></div>
           <div><Label htmlFor="password">{t('register.password')} *</Label><Input id="password" type="password" placeholder="••••••••" value={form.password} onChange={e => update('password', e.target.value)} /></div>
           <div><Label htmlFor="phone">{t('register.phone')}</Label><Input id="phone" placeholder="+966 5XX XXX XXXX" value={form.phone} onChange={e => update('phone', e.target.value)} /></div>
-          <div><Label htmlFor="location">{t('register.location')}</Label><Input id="location" placeholder={t('register.location')} value={form.location} onChange={e => update('location', e.target.value)} /></div>
           <Button type="submit" className="w-full" disabled={loading}>{loading ? t('register.creating') : t('register.submit')}</Button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
