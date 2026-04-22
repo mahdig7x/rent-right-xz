@@ -375,6 +375,21 @@ export default function NearbyPage() {
             </Button>
 
             <div>
+              <label className="text-xs text-muted-foreground mb-2 block">{t('nearby.category')}</label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('nearby.allCategories')}</SelectItem>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>{t(`cat.${c}`) !== `cat.${c}` ? t(`cat.${c}`) : c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <div className="flex justify-between text-xs mb-2">
                 <span className="text-muted-foreground">{t('nearby.radius')}</span>
                 <span className="font-semibold">{radiusKm} km</span>
