@@ -10,12 +10,15 @@ import { toast } from '@/hooks/use-toast';
 import { Navigate } from 'react-router-dom';
 import {
   Users, AlertTriangle, Shield,
-  CheckCircle2, X, ShieldCheck, ShieldOff, Crown, Trash2
+  CheckCircle2, X, ShieldCheck, ShieldOff, Crown, Trash2, Package, Ban, RotateCcw
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
+} from '@/components/ui/sheet';
 
 type UserRow = {
   user_id: string;
@@ -34,6 +37,9 @@ export default function AdminPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [userSearch, setUserSearch] = useState('');
+  const [itemsUser, setItemsUser] = useState<UserRow | null>(null);
+  const [userItems, setUserItems] = useState<any[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -168,9 +174,53 @@ export default function AdminPage() {
   const deleteReport = async (report: any) => {
     const { error } = await supabase.from('reports').delete().eq('id', report.id);
     if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
-    setReports(prev => prev.filter(r => r.id !== report.id));
-    toast({ title: t('admin.report_deleted') });
   };
+
+  const openUserItems = async (u: UserRow) => {
+    setItemsUser(u);
+    setItemsLoading(true);
+    const { data } = await supabase
+      .from('items')
+      .select('id, title, category, price_per_day, status, moderation_status, images, owner_id')
+      .eq('owner_id', u.user_id)
+      .order('created_at', { ascending: false });
+    setUserItems(data || []);
+    setItemsLoading(false);
+  };
+
+  const refreshUserItems = async (ownerId: string) => {
+    const { data } = await supabase
+      .from('items')
+      .select('id, title, category, price_per_day, status, moderation_status, images, owner_id')
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false });
+    setUserItems(data || []);
+  };
+
+  const suspendItem = async (item: any) => {
+    const { error } = await supabase.from('items').update({ moderation_status: 'suspended' }).eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_suspended', item.id, item.title);
+    toast({ title: t('admin.item_suspended') });
+    if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
+  const reactivateItem = async (item: any) => {
+    const { error } = await supabase.from('items').update({ moderation_status: 'approved' }).eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_approved', item.id, item.title);
+    toast({ title: t('admin.item_reactivated') });
+    if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
+  const removeItem = async (item: any) => {
+    const { error } = await supabase.from('items').delete().eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_suspended', item.id, item.title, 'Item deleted');
+    toast({ title: t('admin.item_deleted') });
+    if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
 
 
   const statCards = [
@@ -243,6 +293,10 @@ export default function AdminPage() {
                       {t('admin.adminBadge')}
                     </Badge>
                   )}
+                  <Button size="sm" variant="outline" onClick={() => openUserItems(u)}>
+                    <Package className="me-1 h-4 w-4" />
+                    {t('admin.viewItems')}
+                  </Button>
                   {!u.is_admin ? (
                     <Button size="sm" onClick={() => promoteToAdmin(u)}>
                       <ShieldCheck className="me-1 h-4 w-4" />
@@ -337,6 +391,76 @@ export default function AdminPage() {
           </div>
         )}
       </Card>
+
+      <Sheet open={!!itemsUser} onOpenChange={(o) => !o && setItemsUser(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>{t('admin.userItems')} — {itemsUser?.name}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-3">
+            {itemsLoading ? (
+              <p className="text-sm text-muted-foreground text-center py-6">{t('admin.loading')}</p>
+            ) : userItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUserItems')}</p>
+            ) : (
+              userItems.map((it) => {
+                const suspended = it.moderation_status === 'suspended';
+                return (
+                  <div key={it.id} className="rounded-lg border p-3 flex gap-3">
+                    {it.images?.[0] ? (
+                      <img src={it.images[0]} alt="" className="h-14 w-14 rounded object-cover" />
+                    ) : (
+                      <div className="h-14 w-14 rounded bg-muted flex items-center justify-center">
+                        <Package className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold truncate">{it.title}</p>
+                      <p className="text-xs text-muted-foreground">{it.category} · {it.price_per_day}</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <Badge variant={suspended ? 'destructive' : 'secondary'} className="text-xs">
+                          {it.moderation_status}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {suspended ? (
+                          <Button size="sm" variant="outline" onClick={() => reactivateItem(it)}>
+                            <RotateCcw className="me-1 h-3.5 w-3.5" />
+                            {t('admin.itemReactivate')}
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="secondary" onClick={() => suspendItem(it)}>
+                            <Ban className="me-1 h-3.5 w-3.5" />
+                            {t('admin.itemSuspend')}
+                          </Button>
+                        )}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="destructive">
+                              <Trash2 className="me-1 h-3.5 w-3.5" />
+                              {t('admin.itemDelete')}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{t('admin.itemDelete')}</AlertDialogTitle>
+                              <AlertDialogDescription>{t('admin.itemDeleteConfirm')}</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => removeItem(it)}>{t('admin.itemDelete')}</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
