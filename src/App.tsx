@@ -13,6 +13,7 @@ import EditListingPage from "@/pages/EditListingPage";
 import MyListingsPage from "@/pages/MyListingsPage";
 import MyBookingsPage from "@/pages/MyBookingsPage";
 import BookingRequestsPage from "@/pages/BookingRequestsPage";
+import BookingDetailsPage from "@/pages/BookingDetailsPage";
 import MessagesPage from "@/pages/MessagesPage";
 import ProfilePage from "@/pages/ProfilePage";
 import ReportPage from "@/pages/ReportPage";
@@ -48,6 +49,7 @@ const App = () => {
                       <Route path="/my-listings" element={<MyListingsPage />} />
                       <Route path="/my-bookings" element={<MyBookingsPage />} />
                       <Route path="/booking-requests" element={<BookingRequestsPage />} />
+                      <Route path="/bookings/:id" element={<BookingDetailsPage />} />
                       <Route path="/messages" element={<MessagesPage />} />
                       <Route path="/profile" element={<ProfilePage />} />
                       <Route path="/report" element={<ReportPage />} />

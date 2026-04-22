@@ -220,8 +220,24 @@ export const translations: Record<Locale, Record<string, string>> = {
     // My Bookings
     'myBookings.title': 'My Bookings',
     'myBookings.noBookings': 'No bookings yet. Start browsing items to rent!',
-    'myBookings.cancelled': 'Booking cancelled (demo)',
+    'myBookings.cancelled': 'Booking cancelled',
     'myBookings.from': 'From:',
+    'myBookings.confirmReturn': 'Confirm I returned it',
+    'myBookings.viewDetails': 'View details',
+    'myBookings.returnConfirmed': 'Return confirmation recorded',
+
+    // Tracker
+    'tracker.title': 'Booking progress',
+    'tracker.requested': 'Requested',
+    'tracker.confirmed': 'Confirmed',
+    'tracker.inUse': 'In use',
+    'tracker.completed': 'Completed',
+    'tracker.duration': 'Rental progress',
+    'tracker.renterConfirmed': 'Renter confirmed return',
+    'tracker.lessorConfirmed': 'Lessor confirmed return',
+    'tracker.confirmReturnLessor': 'Confirm item returned',
+    'tracker.waitingOther': 'Waiting for the other party to confirm',
+    'tracker.bothConfirmed': 'Both parties confirmed — booking completed',
 
     // Booking Requests
     'bookingRequests.title': 'Booking Requests',
@@ -652,8 +668,24 @@ export const translations: Record<Locale, Record<string, string>> = {
     // My Bookings
     'myBookings.title': 'حجوزاتي',
     'myBookings.noBookings': 'لا توجد حجوزات بعد. ابدأ بتصفح الأغراض للإيجار!',
-    'myBookings.cancelled': 'تم إلغاء الحجز (تجريبي)',
+    'myBookings.cancelled': 'تم إلغاء الحجز',
     'myBookings.from': 'من:',
+    'myBookings.confirmReturn': 'تأكيد إرجاع المنتج',
+    'myBookings.viewDetails': 'عرض التفاصيل',
+    'myBookings.returnConfirmed': 'تم تسجيل تأكيد الإرجاع',
+
+    // Tracker
+    'tracker.title': 'حالة الطلب',
+    'tracker.requested': 'تم الطلب',
+    'tracker.confirmed': 'تم التأكيد',
+    'tracker.inUse': 'قيد الاستخدام',
+    'tracker.completed': 'مكتمل',
+    'tracker.duration': 'تقدم فترة الإيجار',
+    'tracker.renterConfirmed': 'تأكيد المستأجر',
+    'tracker.lessorConfirmed': 'تأكيد المؤجر',
+    'tracker.confirmReturnLessor': 'تأكيد استلام المنتج',
+    'tracker.waitingOther': 'بانتظار تأكيد الطرف الآخر',
+    'tracker.bothConfirmed': 'تم تأكيد الإرجاع من الطرفين — اكتمل الطلب',
 
     // Booking Requests
     'bookingRequests.title': 'طلبات الحجز',
