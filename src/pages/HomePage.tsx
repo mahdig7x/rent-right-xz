@@ -249,10 +249,10 @@ export default function HomePage() {
                 </Button>
               </Link>
             </motion.div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr items-stretch">
               {featured.map((item, i) => (
-                <motion.div key={item.id} variants={fadeUp} transition={{ delay: i * 0.05 }}>
-                  <ItemCard item={item} />
+                <motion.div key={item.id} variants={fadeUp} transition={{ delay: i * 0.05 }} className="h-full flex">
+                  <div className="w-full h-full flex"><ItemCard item={item} /></div>
                 </motion.div>
               ))}
             </div>
@@ -279,7 +279,7 @@ export default function HomePage() {
               <Badge variant="secondary" className="mb-4 text-xs">{t('home.simpleProcess')}</Badge>
               <h2 className="font-display text-3xl md:text-4xl font-bold">{t('home.howItWorks')}</h2>
             </motion.div>
-            <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto relative">
+            <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto relative auto-rows-fr items-stretch">
               {/* Connector line */}
               <div className="hidden md:block absolute top-16 start-[20%] end-[20%] h-0.5 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
               {[
@@ -287,7 +287,7 @@ export default function HomePage() {
                 { icon: Zap, title: t('home.step2Title'), desc: t('home.step2Desc'), step: '2' },
                 { icon: Star, title: t('home.step3Title'), desc: t('home.step3Desc'), step: '3' },
               ].map((s, i) => (
-                <motion.div key={i} variants={fadeUp} className="relative text-center">
+                <motion.div key={i} variants={fadeUp} className="relative text-center h-full flex flex-col">
                   <div className="mx-auto mb-5 relative">
                     <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-elevated mx-auto">
                       <s.icon className="h-8 w-8" />
@@ -313,14 +313,14 @@ export default function HomePage() {
               <h2 className="font-display text-3xl md:text-4xl font-bold">{t('home.testimonialTitle')}</h2>
               <p className="mt-3 text-muted-foreground">{t('home.testimonialSubtitle')}</p>
             </motion.div>
-            <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+            <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto auto-rows-fr items-stretch">
               {[
                 { name: t('home.test1Name'), role: t('home.test1Role'), text: t('home.test1Text'), rating: 5 },
                 { name: t('home.test2Name'), role: t('home.test2Role'), text: t('home.test2Text'), rating: 5 },
                 { name: t('home.test3Name'), role: t('home.test3Role'), text: t('home.test3Text'), rating: 4 },
               ].map((review, i) => (
-                <motion.div key={i} variants={fadeUp}>
-                  <Card className="p-6 h-full border-0 shadow-card hover:shadow-card-hover transition-shadow">
+                <motion.div key={i} variants={fadeUp} className="h-full flex">
+                  <Card className="p-6 h-full w-full flex flex-col border-0 shadow-card hover:shadow-card-hover transition-shadow">
                     <div className="flex gap-0.5 mb-4">
                       {Array.from({ length: review.rating }).map((_, j) => (
                         <Star key={j} className="h-4 w-4 fill-warning text-warning" />
@@ -347,14 +347,14 @@ export default function HomePage() {
               <h2 className="font-display text-3xl md:text-4xl font-bold">{t('home.trustedSecure')}</h2>
               <p className="mt-3 text-muted-foreground">{t('home.trustSubtitle')}</p>
             </motion.div>
-            <div className="grid gap-6 sm:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-3 auto-rows-fr items-stretch">
               {[
                 { icon: Shield, title: t('home.insurance'), desc: t('home.insuranceDesc'), color: 'bg-primary/10' },
                 { icon: Users, title: t('home.verified'), desc: t('home.verifiedDesc'), color: 'bg-info/10' },
                 { icon: Lock, title: t('home.securePay'), desc: t('home.securePayDesc'), color: 'bg-warning/10' },
               ].map((item, i) => (
-                <motion.div key={i} variants={fadeUp}>
-                  <Card className="p-8 text-center border-2 border-transparent hover:border-primary/20 transition-all group">
+                <motion.div key={i} variants={fadeUp} className="h-full flex">
+                  <Card className="p-8 text-center w-full h-full flex flex-col border-2 border-transparent hover:border-primary/20 transition-all group">
                     <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl ${item.color} group-hover:scale-110 transition-transform`}>
                       <item.icon className="h-8 w-8 text-primary" />
                     </div>
