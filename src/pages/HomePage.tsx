@@ -41,15 +41,21 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { t, isRtl } = useI18n();
   const { items } = useListings();
-  const featured = items.filter(i => i.status === 'available' && i.moderation_status === 'approved').slice(0, 4);
+  const [featuredIds, setFeaturedIds] = useState<string[]>([]);
+  const availableItems = items.filter(i => i.status === 'available' && i.moderation_status === 'approved');
+  const featured = featuredIds.length > 0
+    ? featuredIds.map(id => availableItems.find(i => i.id === id)).filter(Boolean).slice(0, 4) as typeof availableItems
+    : availableItems.slice(0, 4);
   const [liveStats, setLiveStats] = useState({ items: 0, users: 0, satisfaction: 98 });
 
   useEffect(() => {
     (async () => {
-      const [itemsRes, usersRes, reviewsRes] = await Promise.all([
+      const [itemsRes, usersRes, reviewsRes, bookingsRes, itemReviewsRes] = await Promise.all([
         supabase.from('items').select('id', { count: 'exact', head: true }).eq('moderation_status', 'approved'),
         (supabase as any).from('profiles_public').select('id', { count: 'exact', head: true }),
         supabase.from('reviews').select('rating'),
+        supabase.from('bookings').select('item_id'),
+        supabase.from('reviews').select('rating, booking_id, bookings(item_id)'),
       ]);
       const ratings = reviewsRes.data || [];
       const avg = ratings.length > 0 ? Math.round((ratings.reduce((s: number, r: any) => s + r.rating, 0) / ratings.length) * 20) : 98;
@@ -58,6 +64,30 @@ export default function HomePage() {
         users: usersRes.count || 0,
         satisfaction: avg,
       });
+
+      // Score items by demand (bookings count) + average rating
+      const bookingCounts: Record<string, number> = {};
+      (bookingsRes.data || []).forEach((b: any) => {
+        if (b.item_id) bookingCounts[b.item_id] = (bookingCounts[b.item_id] || 0) + 1;
+      });
+      const ratingSums: Record<string, { sum: number; count: number }> = {};
+      (itemReviewsRes.data || []).forEach((r: any) => {
+        const itemId = r.bookings?.item_id;
+        if (!itemId) return;
+        if (!ratingSums[itemId]) ratingSums[itemId] = { sum: 0, count: 0 };
+        ratingSums[itemId].sum += r.rating;
+        ratingSums[itemId].count += 1;
+      });
+      const allItemIds = new Set<string>([...Object.keys(bookingCounts), ...Object.keys(ratingSums)]);
+      const scored = Array.from(allItemIds).map(id => {
+        const demand = bookingCounts[id] || 0;
+        const rs = ratingSums[id];
+        const avgRating = rs && rs.count > 0 ? rs.sum / rs.count : 0;
+        // Weighted score: demand (60%) + rating quality (40%, scaled to 0-5)
+        const score = demand * 0.6 + avgRating * 0.4;
+        return { id, score };
+      }).sort((a, b) => b.score - a.score);
+      setFeaturedIds(scored.map(s => s.id));
     })();
   }, []);
 
