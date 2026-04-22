@@ -49,13 +49,13 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="container py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold">{t('dash.welcome')} {displayName.split(' ')[0]}</h1>
+    <div className="container px-3 sm:px-4 py-6 md:py-8">
+      <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-display text-xl md:text-2xl font-bold truncate">{t('dash.welcome')} {displayName.split(' ')[0]}</h1>
           <p className="text-sm text-muted-foreground">{t('dash.subtitle')}</p>
         </div>
-        <Link to="/listings/new"><Button><Plus className="me-1.5 h-4 w-4" />{t('nav.listItem')}</Button></Link>
+        <Link to="/listings/new" className="shrink-0"><Button className="w-full sm:w-auto"><Plus className="me-1.5 h-4 w-4" />{t('nav.listItem')}</Button></Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
