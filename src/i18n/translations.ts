@@ -417,6 +417,15 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.deleteReport': 'Delete',
     'admin.deleteReportConfirm': 'Delete this report permanently?',
     'admin.report_deleted': 'Report deleted',
+    'admin.viewItems': 'View Items',
+    'admin.userItems': "User's Items",
+    'admin.noUserItems': 'This user has no items',
+    'admin.itemSuspend': 'Suspend',
+    'admin.itemReactivate': 'Reactivate',
+    'admin.itemDelete': 'Delete',
+    'admin.itemDeleteConfirm': 'Permanently delete this item?',
+    'admin.item_deleted': 'Item deleted',
+    'admin.item_reactivated': 'Item reactivated',
     'bookingRequests.failed': 'Action failed',
 
     // Booking status
@@ -883,6 +892,15 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.deleteReport': 'حذف',
     'admin.deleteReportConfirm': 'حذف هذا البلاغ نهائياً؟',
     'admin.report_deleted': 'تم حذف البلاغ',
+    'admin.viewItems': 'عرض المنتجات',
+    'admin.userItems': 'منتجات المستخدم',
+    'admin.noUserItems': 'لا توجد منتجات لهذا المستخدم',
+    'admin.itemSuspend': 'تعليق',
+    'admin.itemReactivate': 'إعادة تفعيل',
+    'admin.itemDelete': 'حذف',
+    'admin.itemDeleteConfirm': 'حذف هذا المنتج نهائياً؟',
+    'admin.item_deleted': 'تم حذف المنتج',
+    'admin.item_reactivated': 'تمت إعادة تفعيل المنتج',
     'bookingRequests.failed': 'فشلت العملية',
 
     // Booking status
