@@ -37,6 +37,9 @@ export default function AdminPage() {
   const [reports, setReports] = useState<any[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [userSearch, setUserSearch] = useState('');
+  const [itemsUser, setItemsUser] = useState<UserRow | null>(null);
+  const [userItems, setUserItems] = useState<any[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
