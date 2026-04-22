@@ -10,12 +10,15 @@ import { toast } from '@/hooks/use-toast';
 import { Navigate } from 'react-router-dom';
 import {
   Users, AlertTriangle, Shield,
-  CheckCircle2, X, ShieldCheck, ShieldOff, Crown, Trash2
+  CheckCircle2, X, ShieldCheck, ShieldOff, Crown, Trash2, Package, Ban, RotateCcw
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
+} from '@/components/ui/sheet';
 
 type UserRow = {
   user_id: string;
