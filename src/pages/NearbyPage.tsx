@@ -162,6 +162,7 @@ export default function NearbyPage() {
   const [userLoc, setUserLoc] = useState<[number, number] | null>(null);
   const [radiusKm, setRadiusKm] = useState(50);
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<string>('all');
   const [geocoding, setGeocoding] = useState(true);
   const [coords, setCoords] = useState<Record<string, [number, number]>>({});
   const [locating, setLocating] = useState(false);
@@ -241,9 +242,14 @@ export default function NearbyPage() {
     if (locationCoords) setCenter(locationCoords);
   };
 
+  const categories = useMemo(() => {
+    return Array.from(new Set(items.map((i) => i.category).filter(Boolean))).sort();
+  }, [items]);
+
   const itemsWithCoords = useMemo(() => {
     return items
       .filter((item) => coords[item.id])
+      .filter((item) => category === 'all' || item.category === category)
       .map((item) => {
         const coord = coords[item.id];
         const distance = userLoc ? haversine(userLoc, coord) : haversine(center, coord);
@@ -251,7 +257,7 @@ export default function NearbyPage() {
       })
       .filter((entry) => entry.distance <= radiusKm)
       .sort((a, b) => a.distance - b.distance);
-  }, [items, coords, userLoc, center, radiusKm]);
+  }, [items, coords, userLoc, center, radiusKm, category]);
 
   useEffect(() => {
     if (!mapElementRef.current || mapRef.current) return;
