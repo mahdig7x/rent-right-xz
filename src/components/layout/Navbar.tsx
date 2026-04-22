@@ -62,13 +62,13 @@ export default function Navbar() {
           )}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="h-9 w-9">
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Button variant="ghost" size="sm" onClick={toggleLang} className="gap-1.5">
+          <Button variant="ghost" size="sm" onClick={toggleLang} className="gap-1.5 px-2 sm:px-3 h-9" aria-label="Toggle language">
             <Globe className="h-4 w-4" />
-            <span className="text-xs">{t('lang.switch')}</span>
+            <span className="text-xs hidden xs:inline sm:inline">{t('lang.switch')}</span>
           </Button>
 
           {isAuthenticated ? (
