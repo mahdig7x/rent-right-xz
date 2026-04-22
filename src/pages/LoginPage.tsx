@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { Button } from '@/components/ui/button';
@@ -15,11 +15,17 @@ export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const pendingEmail = searchParams.get('pending');
+  const [email, setEmail] = useState(pendingEmail || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(!!pendingEmail);
   const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (pendingEmail) setEmail(pendingEmail);
+  }, [pendingEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
