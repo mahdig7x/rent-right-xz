@@ -7,9 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin, Shield } from 'lucide-react';
+import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin, Shield, Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTheme } from '@/contexts/ThemeContext';
 import logo from '@/assets/logo-full.png';
 
 export default function Navbar() {
@@ -17,6 +18,7 @@ export default function Navbar() {
   const { t, locale, setLocale } = useI18n();
   const { totalUnread } = useChat();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -61,6 +63,9 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
           <Button variant="ghost" size="sm" onClick={toggleLang} className="gap-1.5">
             <Globe className="h-4 w-4" />
             <span className="text-xs">{t('lang.switch')}</span>
