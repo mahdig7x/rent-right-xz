@@ -150,6 +150,28 @@ export default function AdminPage() {
     loadUsers();
   };
 
+  const deleteUser = async (target: UserRow) => {
+    if (target.is_super) { toast({ title: t('admin.cannotRemoveSuper'), variant: 'destructive' }); return; }
+    if (target.user_id === user?.id) { toast({ title: t('admin.cannotRemoveSelf'), variant: 'destructive' }); return; }
+    const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+      body: { target_user_id: target.user_id },
+    });
+    if (error || (data as any)?.error) {
+      toast({ title: t('admin.failed'), description: error?.message || (data as any)?.error, variant: 'destructive' });
+      return;
+    }
+    await logAction('user_suspended', target.user_id, target.name, 'User account deleted');
+    toast({ title: t('admin.user_deleted') });
+    loadData();
+  };
+
+  const deleteReport = async (report: any) => {
+    const { error } = await supabase.from('reports').delete().eq('id', report.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    setReports(prev => prev.filter(r => r.id !== report.id));
+    toast({ title: t('admin.report_deleted') });
+  };
+
 
   const statCards = [
     { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'text-blue-500' },
