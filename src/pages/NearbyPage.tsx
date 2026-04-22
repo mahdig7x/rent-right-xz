@@ -358,7 +358,7 @@ export default function NearbyPage() {
     });
 
     requestAnimationFrame(() => map.invalidateSize());
-  }, [itemsWithCoords, radiusKm, t, userLoc]);
+  }, [itemsWithCoords, radiusKm, t, userLoc, selectedItemId]);
 
   useEffect(() => {
     if (!selectedItemId) return;
