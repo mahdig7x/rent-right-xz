@@ -22,7 +22,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (data: { name: string; email: string; password: string; phone?: string; location?: string }) => Promise<{ success: boolean; error?: string }>;
+  register: (data: { name: string; email: string; password: string; phone?: string; location?: string }) => Promise<{ success: boolean; error?: string; needsConfirmation?: boolean; hasSession?: boolean }>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<Pick<Profile, 'name' | 'phone' | 'location' | 'profile_image'>>) => Promise<boolean>;
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const register = useCallback(async (data: { name: string; email: string; password: string; phone?: string; location?: string }) => {
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -120,7 +120,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
     });
     if (error) return { success: false, error: error.message };
-    return { success: true };
+    // If a session is returned, the user is auto-confirmed. Otherwise, email confirmation is required.
+    const hasSession = !!signUpData.session;
+    const isConfirmed = !!signUpData.user?.email_confirmed_at || !!(signUpData.user as any)?.confirmed_at;
+    return { success: true, hasSession, needsConfirmation: !hasSession && !isConfirmed };
   }, []);
 
   const loginWithGoogle = useCallback(async () => {
