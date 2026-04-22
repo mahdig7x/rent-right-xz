@@ -39,6 +39,18 @@ export default function BookingRequestsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('booking-requests-realtime')
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'bookings',
+        filter: `lessor_id=eq.${user.id}`,
+      }, () => { load(); })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, load]);
+
   const handleAction = async (id: string, status: 'confirmed' | 'rejected') => {
     setBusyId(id);
     const { error } = await supabase.from('bookings').update({ status }).eq('id', id);
