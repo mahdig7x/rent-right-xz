@@ -11,10 +11,17 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | null>(null);
 
+const fallbackI18n: I18nContextType = {
+  locale: 'ar',
+  setLocale: () => {},
+  t: (key: string) => translations['ar'][key] || translations['en'][key] || key,
+  dir: 'rtl',
+  isRtl: true,
+};
+
 export const useI18n = () => {
   const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error('useI18n must be used within I18nProvider');
-  return ctx;
+  return ctx ?? fallbackI18n;
 };
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
