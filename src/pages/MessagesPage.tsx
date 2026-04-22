@@ -292,10 +292,10 @@ export default function MessagesPage() {
   );
 
   return (
-    <div className="container py-6 md:py-8">
-      <div className="grid gap-4 lg:grid-cols-3 h-[calc(100vh-12rem)]">
-        <div className={cn("lg:col-span-1", showMobileChat ? 'hidden lg:block' : 'block')}>{conversationList}</div>
-        <div className={cn("lg:col-span-2", !showMobileChat ? 'hidden lg:block' : 'block')}>{chatPanel}</div>
+    <div className="container px-3 sm:px-4 py-3 md:py-8">
+      <div className="grid gap-3 md:gap-4 lg:grid-cols-3 h-[calc(100dvh-9rem)] md:h-[calc(100vh-12rem)]">
+        <div className={cn("lg:col-span-1 min-h-0", showMobileChat ? 'hidden lg:block' : 'block')}>{conversationList}</div>
+        <div className={cn("lg:col-span-2 min-h-0", !showMobileChat ? 'hidden lg:block' : 'block')}>{chatPanel}</div>
       </div>
     </div>
   );

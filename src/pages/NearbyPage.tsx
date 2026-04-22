@@ -40,8 +40,24 @@ const saveGeoCache = (cache: Record<string, [number, number]>) => {
   }
 };
 
+// Try to extract "(lat, lng)" embedded in a free-text location.
+function extractCoordsFromText(text: string): [number, number] | null {
+  if (!text) return null;
+  const m = text.match(/(-?\d{1,3}\.\d+)[\s,،]+(-?\d{1,3}\.\d+)/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lng = parseFloat(m[2]);
+  if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+    return [lat, lng];
+  }
+  return null;
+}
+
 async function geocode(text: string): Promise<[number, number] | null> {
   if (!text) return null;
+
+  const embedded = extractCoordsFromText(text);
+  if (embedded) return embedded;
 
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(text)}`, {
@@ -331,8 +347,8 @@ export default function NearbyPage() {
         <p className="text-sm text-muted-foreground">{t('nearby.subtitle')}</p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3 h-[calc(100vh-14rem)]">
-        <Card className="flex flex-col h-full overflow-hidden lg:order-1 order-2">
+      <div className="grid gap-4 lg:grid-cols-3 lg:h-[calc(100vh-14rem)]">
+        <Card className="flex flex-col overflow-hidden lg:order-1 order-2 lg:h-full max-h-[60vh] lg:max-h-none">
           <div className="p-4 border-b space-y-3">
             <div className="flex gap-2">
               <Input
@@ -399,8 +415,8 @@ export default function NearbyPage() {
           </div>
         </Card>
 
-        <div className="lg:col-span-2 lg:order-2 order-1 rounded-xl overflow-hidden border bg-muted min-h-[400px]">
-          <div ref={mapElementRef} className="h-full w-full" style={{ minHeight: 400 }} />
+        <div className="lg:col-span-2 lg:order-2 order-1 rounded-xl overflow-hidden border bg-muted h-[55vh] lg:h-full min-h-[320px]">
+          <div ref={mapElementRef} className="h-full w-full" />
         </div>
       </div>
     </div>
