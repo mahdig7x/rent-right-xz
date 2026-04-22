@@ -113,7 +113,7 @@ export default function HomePage() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="absolute top-24 end-[8%] hidden lg:block animate-float"
         >
-          <img src={logo} alt="" className="w-32 h-32 object-contain drop-shadow-2xl rotate-6" />
+          <img src={logo} alt="" className="w-48 h-48 object-contain drop-shadow-2xl rotate-6" />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -122,7 +122,7 @@ export default function HomePage() {
           className="absolute bottom-32 start-[6%] hidden lg:block animate-float"
           style={{ animationDelay: '2s' }}
         >
-          <img src={logo} alt="" className="w-20 h-20 object-contain drop-shadow-xl -rotate-12 opacity-60" />
+          <img src={logo} alt="" className="w-32 h-32 object-contain drop-shadow-xl -rotate-12 opacity-60" />
         </motion.div>
 
         <div className="container relative z-10 py-20">
