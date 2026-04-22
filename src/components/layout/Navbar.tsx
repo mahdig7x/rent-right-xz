@@ -104,6 +104,7 @@ export default function Navbar() {
                     <Link to="/dashboard" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.dashboard')}</Button></Link>
                     <Link to="/messages" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.messages')}</Button></Link>
                     <Link to="/listings/new" onClick={() => setOpen(false)}><Button className="w-full justify-start">{t('nav.listItem')}</Button></Link>
+                    {isAdmin && <Link to="/admin" onClick={() => setOpen(false)}><Button variant="outline" className="w-full justify-start gap-2"><Shield className="h-4 w-4" />Admin</Button></Link>}
                     <Link to="/profile" onClick={() => setOpen(false)}><Button variant="ghost" className="w-full justify-start">{t('nav.profile')}</Button></Link>
                     <Button variant="ghost" className="w-full justify-start" onClick={() => { logout(); navigate('/'); setOpen(false); }}>{t('nav.logout')}</Button>
                   </>
