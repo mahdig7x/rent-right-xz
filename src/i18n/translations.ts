@@ -411,6 +411,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.cannotRemoveSelf': 'You cannot remove yourself',
     'admin.searchUsers': 'Search users by name or email',
     'admin.noUsers': 'No users found',
+    'admin.deleteUser': 'Delete User',
+    'admin.deleteUserConfirm': 'Permanently delete this user and all their data? This cannot be undone.',
+    'admin.user_deleted': 'User deleted',
+    'admin.deleteReport': 'Delete',
+    'admin.deleteReportConfirm': 'Delete this report permanently?',
+    'admin.report_deleted': 'Report deleted',
     'bookingRequests.failed': 'Action failed',
 
     // Booking status
@@ -871,6 +877,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.cannotRemoveSelf': 'لا يمكنك إزالة نفسك',
     'admin.searchUsers': 'ابحث بالاسم أو البريد',
     'admin.noUsers': 'لا يوجد مستخدمون',
+    'admin.deleteUser': 'حذف المستخدم',
+    'admin.deleteUserConfirm': 'سيتم حذف هذا المستخدم وكل بياناته نهائياً. هل أنت متأكد؟',
+    'admin.user_deleted': 'تم حذف المستخدم',
+    'admin.deleteReport': 'حذف',
+    'admin.deleteReportConfirm': 'حذف هذا البلاغ نهائياً؟',
+    'admin.report_deleted': 'تم حذف البلاغ',
     'bookingRequests.failed': 'فشلت العملية',
 
     // Booking status

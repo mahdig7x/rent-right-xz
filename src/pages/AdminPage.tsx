@@ -10,8 +10,12 @@ import { toast } from '@/hooks/use-toast';
 import { Navigate } from 'react-router-dom';
 import {
   Users, AlertTriangle, Shield,
-  CheckCircle2, X, ShieldCheck, ShieldOff, Crown
+  CheckCircle2, X, ShieldCheck, ShieldOff, Crown, Trash2
 } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 type UserRow = {
   user_id: string;
@@ -146,6 +150,28 @@ export default function AdminPage() {
     loadUsers();
   };
 
+  const deleteUser = async (target: UserRow) => {
+    if (target.is_super) { toast({ title: t('admin.cannotRemoveSuper'), variant: 'destructive' }); return; }
+    if (target.user_id === user?.id) { toast({ title: t('admin.cannotRemoveSelf'), variant: 'destructive' }); return; }
+    const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+      body: { target_user_id: target.user_id },
+    });
+    if (error || (data as any)?.error) {
+      toast({ title: t('admin.failed'), description: error?.message || (data as any)?.error, variant: 'destructive' });
+      return;
+    }
+    await logAction('user_suspended', target.user_id, target.name, 'User account deleted');
+    toast({ title: t('admin.user_deleted') });
+    loadData();
+  };
+
+  const deleteReport = async (report: any) => {
+    const { error } = await supabase.from('reports').delete().eq('id', report.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    setReports(prev => prev.filter(r => r.id !== report.id));
+    toast({ title: t('admin.report_deleted') });
+  };
+
 
   const statCards = [
     { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'text-blue-500' },
@@ -225,7 +251,7 @@ export default function AdminPage() {
                   ) : (
                     <Button
                       size="sm"
-                      variant="destructive"
+                      variant="secondary"
                       disabled={u.is_super || u.user_id === user?.id}
                       onClick={() => removeAdmin(u)}
                     >
@@ -233,6 +259,28 @@ export default function AdminPage() {
                       {t('admin.removeAdmin')}
                     </Button>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={u.is_super || u.user_id === user?.id}
+                      >
+                        <Trash2 className="me-1 h-4 w-4" />
+                        {t('admin.deleteUser')}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('admin.deleteUser')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('admin.deleteUserConfirm')}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteUser(u)}>{t('admin.deleteUser')}</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             ))}
@@ -266,6 +314,23 @@ export default function AdminPage() {
                       </Button>
                     </>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="destructive">
+                        <Trash2 className="me-1 h-4 w-4" />{t('admin.deleteReport')}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('admin.deleteReport')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('admin.deleteReportConfirm')}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteReport(report)}>{t('admin.deleteReport')}</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             ))}
