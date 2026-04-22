@@ -79,6 +79,7 @@ export default function Navbar() {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => navigate('/profile')}><UserIcon className="me-2 h-4 w-4" />{t('nav.profile')}</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/dashboard')}><LayoutDashboard className="me-2 h-4 w-4" />{t('nav.dashboard')}</DropdownMenuItem>
+                {isAdmin && <DropdownMenuItem onClick={() => navigate('/admin')}><Shield className="me-2 h-4 w-4" />Admin</DropdownMenuItem>}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => { logout(); navigate('/'); }}><LogOut className="me-2 h-4 w-4" />{t('nav.logout')}</DropdownMenuItem>
               </DropdownMenuContent>
