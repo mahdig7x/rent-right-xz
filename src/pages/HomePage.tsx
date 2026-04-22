@@ -194,13 +194,33 @@ export default function HomePage() {
             <h2 className="font-display text-3xl md:text-4xl font-bold">{t('home.browseByCategory')}</h2>
             <p className="mt-3 text-muted-foreground">{t('home.categorySubtitle')}</p>
           </motion.div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+
+          {/* Mobile: vertical scroll list */}
+          <div className="sm:hidden max-h-[60vh] overflow-y-auto pe-1 -me-1 space-y-3 snap-y snap-mandatory">
             {CATEGORIES.map(cat => {
               const Icon = CATEGORY_ICONS[cat] || Package;
               return (
-                <motion.div key={cat} variants={fadeUp}>
-                  <Link to={`/browse?category=${encodeURIComponent(cat)}`}>
-                    <Card className="group flex flex-col items-center gap-3 p-6 text-center cursor-pointer border-2 border-transparent hover:border-primary/30 hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
+                <Link key={cat} to={`/browse?category=${encodeURIComponent(cat)}`} className="block snap-start">
+                  <Card className="group flex items-center gap-4 p-4 border-2 border-transparent hover:border-primary/30 hover:shadow-card-hover transition-all duration-300 active:scale-[0.99]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <span className="font-display text-base font-semibold leading-tight flex-1">{t(`cat.${cat}`)}</span>
+                    <ArrowRight className={`h-5 w-5 text-muted-foreground shrink-0 ${isRtl ? 'rotate-180' : ''}`} />
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Tablet/Desktop: equal-height grid */}
+          <div className="hidden sm:grid grid-cols-3 md:grid-cols-5 gap-4 auto-rows-fr items-stretch">
+            {CATEGORIES.map(cat => {
+              const Icon = CATEGORY_ICONS[cat] || Package;
+              return (
+                <motion.div key={cat} variants={fadeUp} className="h-full">
+                  <Link to={`/browse?category=${encodeURIComponent(cat)}`} className="block h-full">
+                    <Card className="group h-full flex flex-col items-center justify-center gap-3 p-6 text-center cursor-pointer border-2 border-transparent hover:border-primary/30 hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1">
                       <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                         <Icon className="h-7 w-7 text-primary" />
                       </div>
