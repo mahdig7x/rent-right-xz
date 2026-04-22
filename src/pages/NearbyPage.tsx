@@ -158,7 +158,9 @@ function buildPopupContent({
 
 export default function NearbyPage() {
   const { t } = useI18n();
-  const { items } = useListings();
+  const { items: allItems } = useListings();
+  const { user } = useAuth();
+  const items = useMemo(() => allItems.filter((i) => !user || i.owner_id !== user.id), [allItems, user]);
   const [center, setCenter] = useState<[number, number]>([24.7136, 46.6753]);
   const [userLoc, setUserLoc] = useState<[number, number] | null>(null);
   const [radiusKm, setRadiusKm] = useState(50);
