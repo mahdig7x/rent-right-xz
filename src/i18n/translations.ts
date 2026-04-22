@@ -164,6 +164,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'login.demo': 'Demo: use any email (e.g. alex@rentright.com) with any password',
     'login.fillFields': 'Please fill in all fields',
     'login.welcomeBack': 'Welcome back!',
+    'login.google': 'Login with Google',
+    'login.or': 'or',
 
     // Register
     'register.title': 'Create your account',
@@ -178,6 +180,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     'register.hasAccount': 'Already have an account?',
     'register.fillFields': 'Please fill required fields',
     'register.created': 'Account created!',
+    'register.googleSignup': 'Sign up with Google',
+    'register.passwordWeak': 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol',
+    'register.checkEmail': 'Account created — please log in',
+    'register.checkEmailDesc': 'You can now sign in with your credentials.',
 
     // Dashboard
     'dash.welcome': 'Welcome back,',
@@ -639,6 +645,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'login.demo': 'تجريبي: استخدم أي بريد (مثل alex@rentright.com) مع أي كلمة مرور',
     'login.fillFields': 'يرجى ملء جميع الحقول',
     'login.welcomeBack': 'مرحباً بعودتك!',
+    'login.google': 'تسجيل دخول جوجل',
+    'login.or': 'أو',
 
     // Register
     'register.title': 'أنشئ حسابك',
@@ -653,6 +661,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     'register.hasAccount': 'لديك حساب بالفعل؟',
     'register.fillFields': 'يرجى ملء الحقول المطلوبة',
     'register.created': 'تم إنشاء الحساب!',
+    'register.googleSignup': 'التسجيل بحساب جوجل',
+    'register.passwordWeak': 'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتحتوي على حرف كبير وحرف صغير ورقم ورمز',
+    'register.checkEmail': 'تم إنشاء الحساب — يُرجى تسجيل الدخول',
+    'register.checkEmailDesc': 'يمكنك الآن تسجيل الدخول باستخدام بياناتك.',
 
     // Dashboard
     'dash.welcome': 'مرحباً بعودتك،',
