@@ -17,7 +17,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useI18n } from '@/contexts/I18nContext';
 import { supabase } from '@/integrations/supabase/client';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo-full.png';
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
