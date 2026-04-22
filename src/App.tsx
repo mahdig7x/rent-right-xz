@@ -24,11 +24,13 @@ import { I18nProvider } from "@/contexts/I18nContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { ListingsProvider } from "@/contexts/ListingsContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const App = () => {
   return (
-    <I18nProvider>
-      <AuthProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <AuthProvider>
         <ChatProvider>
           <ListingsProvider>
             <NotificationsProvider>
@@ -63,8 +65,9 @@ const App = () => {
             </NotificationsProvider>
           </ListingsProvider>
         </ChatProvider>
-      </AuthProvider>
-    </I18nProvider>
+        </AuthProvider>
+      </I18nProvider>
+    </ThemeProvider>
   );
 };
 
