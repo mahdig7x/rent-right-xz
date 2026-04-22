@@ -319,7 +319,28 @@ export default function NearbyPage() {
     }
 
     itemsWithCoords.forEach(({ item, coord, distance }) => {
-      const marker = L.marker(coord, { title: item.title });
+      const fallbackImg = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&h=120&fit=crop';
+      const img = (item.images && item.images[0]) || fallbackImg;
+      const isSelected = selectedItemId === item.id;
+      const html = `
+        <div class="nearby-pin ${isSelected ? 'is-selected' : ''}" style="--pin-color:${primaryColor}">
+          <div class="nearby-pin__bubble">
+            <img src="${img}" alt="" />
+            <span class="nearby-pin__price">$${item.price_per_day}</span>
+          </div>
+          <div class="nearby-pin__tail"></div>
+        </div>
+      `;
+
+      const icon = L.divIcon({
+        className: 'nearby-pin-wrapper',
+        html,
+        iconSize: [56, 72],
+        iconAnchor: [28, 70],
+        popupAnchor: [0, -64],
+      });
+
+      const marker = L.marker(coord, { icon, title: item.title, riseOnHover: true });
       marker.bindPopup(
         buildPopupContent({
           item,
@@ -331,12 +352,13 @@ export default function NearbyPage() {
         { minWidth: 220 }
       );
 
+      marker.on('click', () => setSelectedItemId(item.id));
       marker.addTo(markersLayer);
       markerRefs.current[item.id] = marker;
     });
 
     requestAnimationFrame(() => map.invalidateSize());
-  }, [itemsWithCoords, radiusKm, t, userLoc]);
+  }, [itemsWithCoords, radiusKm, t, userLoc, selectedItemId]);
 
   useEffect(() => {
     if (!selectedItemId) return;
