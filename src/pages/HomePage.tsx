@@ -116,7 +116,7 @@ export default function HomePage() {
             <motion.h1 variants={fadeUp} className="font-display text-[2.25rem] xs:text-4xl tracking-tight sm:text-6xl md:text-7xl leading-[1.05] sm:leading-[0.95] text-center mx-0 pb-[19px] py-[16px] border-none font-extrabold lg:text-7xl break-words [text-wrap:balance]">
               {t('home.title1')}
               <br />
-              <span className="text-gradient inline-block mt-2">
+              <span className="text-gradient inline-block mt-2 my-[9px] py-[10px]">
                 {t('home.title2')}
               </span>
             </motion.h1>
