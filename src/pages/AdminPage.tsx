@@ -161,14 +161,6 @@ export default function AdminPage() {
     loadUsers();
   };
 
-  const filteredUsers = useMemo(() => {
-    const q = userSearch.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(u =>
-      u.name.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q)
-    );
-  }, [users, userSearch]);
 
   const statCards = [
     { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'text-blue-500' },
