@@ -314,6 +314,23 @@ export default function AdminPage() {
                       </Button>
                     </>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="destructive">
+                        <Trash2 className="me-1 h-4 w-4" />{t('admin.deleteReport')}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('admin.deleteReport')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('admin.deleteReportConfirm')}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteReport(report)}>{t('admin.deleteReport')}</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             ))}
