@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin } from 'lucide-react';
 import { useState } from 'react';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo-full.png';
 
 export default function Navbar() {
   const { isAuthenticated, profile, logout } = useAuth();
@@ -23,9 +23,8 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <img src={logo} alt="Rent Right" className="h-10 w-10 object-contain rounded-lg transition-transform group-hover:scale-105" />
-          <span className="font-display text-xl font-extrabold tracking-tight text-foreground hidden sm:inline">Rent<span className="text-primary">Right</span></span>
+        <Link to="/" className="flex items-center group">
+          <img src={logo} alt="Rent Right استأجر صح" className="h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-105" />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
