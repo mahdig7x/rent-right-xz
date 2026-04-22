@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, Plus, MessageSquare, LayoutDashboard, LogOut, User as UserIcon, Globe, MapPin, Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo-full.png';
 
 export default function Navbar() {
