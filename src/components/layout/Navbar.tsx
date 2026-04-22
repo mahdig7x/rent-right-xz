@@ -53,6 +53,9 @@ export default function Navbar() {
                 )}
               </Link>
               <Link to="/listings/new"><Button size="sm" className="ms-2"><Plus className="me-1.5 h-4 w-4" />{t('nav.listItem')}</Button></Link>
+              {isAdmin && (
+                <Link to="/admin"><Button variant="outline" size="sm" className="ms-1 gap-1.5"><Shield className="h-4 w-4" />Admin</Button></Link>
+              )}
             </>
           )}
         </nav>
