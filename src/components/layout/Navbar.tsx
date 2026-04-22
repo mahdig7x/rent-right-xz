@@ -42,7 +42,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           <Link to="/browse"><Button variant="ghost" size="sm">{t('nav.browse')}</Button></Link>
           <Link to="/nearby"><Button variant="ghost" size="sm"><MapPin className="me-1.5 h-4 w-4" />{t('nav.nearby')}</Button></Link>
           {isAuthenticated && (
@@ -90,14 +90,14 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden gap-2 md:flex">
+            <div className="hidden gap-2 lg:flex">
               <Link to="/login"><Button variant="ghost" size="sm">{t('nav.login')}</Button></Link>
               <Link to="/register"><Button size="sm">{t('nav.signup')}</Button></Link>
             </div>
           )}
 
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /></Button>
             </SheetTrigger>
             <SheetContent side={locale === 'ar' ? 'left' : 'right'} className="w-72">
