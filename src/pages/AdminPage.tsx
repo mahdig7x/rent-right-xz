@@ -99,6 +99,15 @@ export default function AdminPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  const filteredUsers = useMemo(() => {
+    const q = userSearch.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter(u =>
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q)
+    );
+  }, [users, userSearch]);
+
   if (isAdmin === null) return <div className="container py-32 text-center text-muted-foreground">{t('admin.loading')}</div>;
   if (!isAdmin) return <Navigate to="/" replace />;
 
