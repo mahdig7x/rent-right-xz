@@ -24,7 +24,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center group">
-          <img src={logo} alt="Rent Right استأجر صح" className="h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-105" />
+          <img src={logo} alt="Rent Right استأجر صح" className="h-14 md:h-16 w-auto object-contain transition-transform group-hover:scale-105" />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
