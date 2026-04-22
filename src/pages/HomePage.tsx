@@ -133,7 +133,7 @@ export default function HomePage() {
             className="mx-auto max-w-4xl text-center"
           >
             <motion.div variants={fadeUp} className="flex justify-center mb-8 lg:hidden">
-              <img src={logo} alt="Rent Right" className="w-24 h-24 object-contain drop-shadow-xl" />
+              <img src={logo} alt="Rent Right" className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain drop-shadow-xl" />
             </motion.div>
 
             <motion.div variants={fadeUp}>
