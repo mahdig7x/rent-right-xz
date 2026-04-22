@@ -31,6 +31,18 @@ export default function MyBookingsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('my-bookings-realtime')
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'bookings',
+        filter: `renter_id=eq.${user.id}`,
+      }, () => { load(); })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, load]);
+
   const confirmReturn = async (bookingId: string) => {
     setBusyId(bookingId);
     const { error } = await (supabase as any)
