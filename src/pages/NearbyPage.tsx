@@ -321,7 +321,11 @@ export default function NearbyPage() {
         .addTo(overlaysLayer);
     }
 
-    itemsWithCoords.forEach(({ item, coord, distance }) => {
+    const visibleItems = selectedItemId
+      ? itemsWithCoords.filter((entry) => entry.item.id === selectedItemId)
+      : itemsWithCoords;
+
+    visibleItems.forEach(({ item, coord, distance }) => {
       const fallbackImg = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=120&h=120&fit=crop';
       const img = (item.images && item.images[0]) || fallbackImg;
       const isSelected = selectedItemId === item.id;
@@ -361,12 +365,22 @@ export default function NearbyPage() {
     });
 
     requestAnimationFrame(() => map.invalidateSize());
+
+    const handleMapClick = () => setSelectedItemId(null);
+    map.on('click', handleMapClick);
+
+    return () => {
+      map.off('click', handleMapClick);
+    };
   }, [itemsWithCoords, radiusKm, t, userLoc, selectedItemId]);
 
   useEffect(() => {
     if (!selectedItemId) return;
     const marker = markerRefs.current[selectedItemId];
-    if (marker) marker.openPopup();
+    if (marker) {
+      marker.openPopup();
+      marker.on('popupclose', () => setSelectedItemId(null));
+    }
   }, [selectedItemId, itemsWithCoords]);
 
   return (
