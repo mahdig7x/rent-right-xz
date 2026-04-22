@@ -475,6 +475,7 @@ export default function ItemDetailsPage() {
                         <CheckCircle2 className="h-3.5 w-3.5 text-primary" />{t('details.verifiedMember')}
                       </p>
                     </div>
+                    {user?.id !== item.owner_id && (
                     <Dialog open={messageOpen} onOpenChange={setMessageOpen}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="gap-1.5 shrink-0">
@@ -494,6 +495,7 @@ export default function ItemDetailsPage() {
                         <Button onClick={handleMessage} className="w-full">{t('details.sendMessage')}</Button>
                       </DialogContent>
                     </Dialog>
+                    )}
                   </div>
                 </Card>
               </motion.div>
@@ -664,6 +666,12 @@ export default function ItemDetailsPage() {
                   </AnimatePresence>
 
                   {/* Book Button */}
+                  {user?.id === item.owner_id ? (
+                    <Button className="w-full h-12 text-base font-semibold rounded-xl" size="lg" variant="secondary" disabled>
+                      <CalendarIcon className="me-2 h-5 w-5" />
+                      {t('details.ownerCannotBook')}
+                    </Button>
+                  ) : (
                   <Dialog open={bookingOpen} onOpenChange={(open) => {
                     setBookingOpen(open);
                     if (!open) setBookingState('idle');
@@ -717,6 +725,7 @@ export default function ItemDetailsPage() {
                       </AnimatePresence>
                     </DialogContent>
                   </Dialog>
+                  )}
 
                   {/* Quick Info */}
                   <div className="space-y-3 pt-2">
