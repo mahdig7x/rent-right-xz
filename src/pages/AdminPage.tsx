@@ -251,7 +251,7 @@ export default function AdminPage() {
                   ) : (
                     <Button
                       size="sm"
-                      variant="destructive"
+                      variant="secondary"
                       disabled={u.is_super || u.user_id === user?.id}
                       onClick={() => removeAdmin(u)}
                     >
@@ -259,6 +259,28 @@ export default function AdminPage() {
                       {t('admin.removeAdmin')}
                     </Button>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={u.is_super || u.user_id === user?.id}
+                      >
+                        <Trash2 className="me-1 h-4 w-4" />
+                        {t('admin.deleteUser')}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('admin.deleteUser')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('admin.deleteUserConfirm')}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteUser(u)}>{t('admin.deleteUser')}</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             ))}
