@@ -452,7 +452,7 @@ export const translations: Record<Locale, Record<string, string>> = {
   ar: {
     // Nav
     'nav.browse': 'تصفح',
-    'nav.nearby': 'خريطة قريبة',
+    'nav.nearby': 'الخريطة',
     'nav.dashboard': 'لوحة التحكم',
     'nav.messages': 'الرسائل',
     'nav.listItem': 'أضف إعلان',
