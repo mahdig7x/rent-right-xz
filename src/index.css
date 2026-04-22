@@ -171,3 +171,12 @@
   border-right: 7px solid transparent;
   border-top: 10px solid var(--pin-color, #2563eb);
 }
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
