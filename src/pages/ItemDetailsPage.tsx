@@ -664,6 +664,12 @@ export default function ItemDetailsPage() {
                   </AnimatePresence>
 
                   {/* Book Button */}
+                  {user?.id === item.owner_id ? (
+                    <Button className="w-full h-12 text-base font-semibold rounded-xl" size="lg" variant="secondary" disabled>
+                      <CalendarIcon className="me-2 h-5 w-5" />
+                      {t('details.ownerCannotBook')}
+                    </Button>
+                  ) : (
                   <Dialog open={bookingOpen} onOpenChange={(open) => {
                     setBookingOpen(open);
                     if (!open) setBookingState('idle');
