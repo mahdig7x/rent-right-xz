@@ -52,7 +52,9 @@ export type Database = {
           insurance_amount: number | null
           item_id: string
           lessor_id: string
+          lessor_returned_at: string | null
           renter_id: string
+          renter_returned_at: string | null
           start_date: string
           status: Database["public"]["Enums"]["booking_status"]
           total_price: number
@@ -64,7 +66,9 @@ export type Database = {
           insurance_amount?: number | null
           item_id: string
           lessor_id: string
+          lessor_returned_at?: string | null
           renter_id: string
+          renter_returned_at?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["booking_status"]
           total_price: number
@@ -76,7 +80,9 @@ export type Database = {
           insurance_amount?: number | null
           item_id?: string
           lessor_id?: string
+          lessor_returned_at?: string | null
           renter_id?: string
+          renter_returned_at?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["booking_status"]
           total_price?: number
