@@ -378,6 +378,8 @@ export default function NearbyPage() {
     if (!selectedItemId) return;
     const marker = markerRefs.current[selectedItemId];
     if (marker) {
+      const latlng = marker.getLatLng();
+      mapRef.current?.flyTo([latlng.lat, latlng.lng], 15, { duration: 0.8 });
       marker.openPopup();
       marker.on('popupclose', () => setSelectedItemId(null));
     }
