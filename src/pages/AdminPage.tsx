@@ -223,7 +223,7 @@ export default function AdminPage() {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   {u.is_super && (
-                    <Badge className="gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                    <Badge className="gap-1 bg-primary/15 text-primary border border-primary/30 hover:bg-primary/20">
                       <Crown className="h-3 w-3" />
                       {t('admin.superAdmin')}
                     </Badge>
