@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import {
   Users, AlertTriangle, Shield,
   CheckCircle2, X, ShieldCheck, ShieldOff, Crown
@@ -26,8 +26,7 @@ export default function AdminPage() {
   const { user } = useAuth();
   const { t } = useI18n();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [stats, setStats] = useState({ totalUsers: 0, totalListings: 0, pendingListings: 0, openReports: 0 });
-  const [items, setItems] = useState<any[]>([]);
+  const [stats, setStats] = useState({ totalUsers: 0, openReports: 0 });
   const [reports, setReports] = useState<any[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [userSearch, setUserSearch] = useState('');
@@ -66,12 +65,10 @@ export default function AdminPage() {
 
   const loadData = useCallback(async () => {
     if (!isAdmin) return;
-    const [usersRes, itemsRes, reportsRes] = await Promise.all([
+    const [usersRes, reportsRes] = await Promise.all([
       supabase.from('profiles').select('id', { count: 'exact', head: true }),
-      supabase.from('items').select('id, title, moderation_status, created_at, owner_id').order('created_at', { ascending: false }),
       supabase.from('reports').select('*').order('created_at', { ascending: false }),
     ]);
-    const allItems = itemsRes.data || [];
     const allReports = reportsRes.data || [];
 
     const reporterIds = [...new Set(allReports.map((r: any) => r.user_id))];
@@ -86,12 +83,9 @@ export default function AdminPage() {
       }
     }
 
-    setItems(allItems);
     setReports(allReports.map((r: any) => ({ ...r, reporter_name: profilesMap[r.user_id] || 'مستخدم' })));
     setStats({
       totalUsers: usersRes.count || 0,
-      totalListings: allItems.length,
-      pendingListings: allItems.filter((i: any) => i.moderation_status === 'pending_review').length,
       openReports: allReports.filter((r: any) => r.status === 'submitted' || r.status === 'under_review').length,
     });
     await loadUsers();
@@ -120,15 +114,6 @@ export default function AdminPage() {
       target_label: targetLabel,
       note: note || null,
     });
-  };
-
-  const handleItemAction = async (item: any, status: 'approved' | 'flagged' | 'suspended') => {
-    const { error } = await supabase.from('items').update({ moderation_status: status }).eq('id', item.id);
-    if (error) { toast({ title: t('admin.failed'), variant: 'destructive' }); return; }
-    const actionType = status === 'approved' ? 'listing_approved' : status === 'flagged' ? 'listing_flagged' : 'listing_suspended';
-    await logAction(actionType, item.id, item.title);
-    setItems(prev => prev.map(i => i.id === item.id ? { ...i, moderation_status: status } : i));
-    toast({ title: t(`admin.item_${status}`) });
   };
 
   const handleReport = async (report: any, action: 'resolved' | 'rejected') => {
@@ -164,12 +149,10 @@ export default function AdminPage() {
 
   const statCards = [
     { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'text-blue-500' },
-    { icon: Package, label: t('admin.listings'), value: stats.totalListings, color: 'text-green-500' },
-    { icon: Eye, label: t('admin.pending'), value: stats.pendingListings, color: 'text-yellow-500' },
     { icon: AlertTriangle, label: t('admin.openReports'), value: stats.openReports, color: 'text-red-500' },
   ];
 
-  const pendingItems = items.filter(i => i.moderation_status === 'pending_review' || i.moderation_status === 'flagged');
+  
 
   return (
     <div className="container py-8">
@@ -178,7 +161,7 @@ export default function AdminPage() {
         <h1 className="font-display text-2xl font-bold">{t('admin.title')}</h1>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 mb-8">
         {statCards.map(s => (
           <Card key={s.label} className="p-5">
             <div className="flex items-center justify-between mb-2">
