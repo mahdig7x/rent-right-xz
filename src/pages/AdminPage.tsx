@@ -2,15 +2,25 @@ import { useI18n } from '@/contexts/I18nContext';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Navigate, Link } from 'react-router-dom';
 import {
   Users, Package, AlertTriangle, Shield,
-  Eye, CheckCircle2, Flag, Ban, X
+  Eye, CheckCircle2, Flag, Ban, X, ShieldCheck, ShieldOff, Crown
 } from 'lucide-react';
+
+type UserRow = {
+  user_id: string;
+  name: string;
+  email: string;
+  profile_image: string | null;
+  is_admin: boolean;
+  is_super: boolean;
+};
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -19,6 +29,8 @@ export default function AdminPage() {
   const [stats, setStats] = useState({ totalUsers: 0, totalListings: 0, pendingListings: 0, openReports: 0 });
   const [items, setItems] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
+  const [users, setUsers] = useState<UserRow[]>([]);
+  const [userSearch, setUserSearch] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -26,6 +38,31 @@ export default function AdminPage() {
       setIsAdmin(data && data.length > 0);
     });
   }, [user]);
+
+  const loadUsers = useCallback(async () => {
+    const [profilesRes, rolesRes, superRes] = await Promise.all([
+      (supabase as any).from('profiles_public').select('user_id, name, profile_image').order('name'),
+      supabase.from('user_roles').select('user_id, role').eq('role', 'admin'),
+      (supabase as any).from('super_admins').select('user_id'),
+    ]);
+    const profiles = profilesRes.data || [];
+    const adminIds = new Set((rolesRes.data || []).map((r: any) => r.user_id));
+    const superIds = new Set((superRes.data || []).map((s: any) => s.user_id));
+
+    // Fetch emails from full profiles (only visible to admins via RLS)
+    const { data: emails } = await supabase.from('profiles').select('user_id, email');
+    const emailMap: Record<string, string> = {};
+    (emails || []).forEach((e: any) => { emailMap[e.user_id] = e.email; });
+
+    setUsers(profiles.map((p: any) => ({
+      user_id: p.user_id,
+      name: p.name || '—',
+      email: emailMap[p.user_id] || '',
+      profile_image: p.profile_image,
+      is_admin: adminIds.has(p.user_id),
+      is_super: superIds.has(p.user_id),
+    })));
+  }, []);
 
   const loadData = useCallback(async () => {
     if (!isAdmin) return;
@@ -57,7 +94,8 @@ export default function AdminPage() {
       pendingListings: allItems.filter((i: any) => i.moderation_status === 'pending_review').length,
       openReports: allReports.filter((r: any) => r.status === 'submitted' || r.status === 'under_review').length,
     });
-  }, [isAdmin]);
+    await loadUsers();
+  }, [isAdmin, loadUsers]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -96,6 +134,33 @@ export default function AdminPage() {
     toast({ title: t(`admin.report_${action}`) });
   };
 
+  const promoteToAdmin = async (target: UserRow) => {
+    const { error } = await supabase.from('user_roles').insert({ user_id: target.user_id, role: 'admin' });
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('user_activated', target.user_id, target.name, 'Promoted to admin');
+    toast({ title: t('admin.user_promoted') });
+    loadUsers();
+  };
+
+  const removeAdmin = async (target: UserRow) => {
+    if (target.is_super) { toast({ title: t('admin.cannotRemoveSuper'), variant: 'destructive' }); return; }
+    if (target.user_id === user?.id) { toast({ title: t('admin.cannotRemoveSelf'), variant: 'destructive' }); return; }
+    const { error } = await supabase.from('user_roles').delete().eq('user_id', target.user_id).eq('role', 'admin');
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('user_suspended', target.user_id, target.name, 'Admin role removed');
+    toast({ title: t('admin.user_demoted') });
+    loadUsers();
+  };
+
+  const filteredUsers = useMemo(() => {
+    const q = userSearch.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter(u =>
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q)
+    );
+  }, [users, userSearch]);
+
   const statCards = [
     { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'text-blue-500' },
     { icon: Package, label: t('admin.listings'), value: stats.totalListings, color: 'text-green-500' },
@@ -123,6 +188,73 @@ export default function AdminPage() {
           </Card>
         ))}
       </div>
+
+      {/* Manage Users */}
+      <Card className="p-6 mb-6">
+        <h2 className="font-display text-lg font-semibold mb-4 flex items-center gap-2">
+          <Users className="h-5 w-5 text-primary" />
+          {t('admin.manageUsers')}
+        </h2>
+        <Input
+          placeholder={t('admin.searchUsers')}
+          value={userSearch}
+          onChange={(e) => setUserSearch(e.target.value)}
+          className="mb-4"
+        />
+        {filteredUsers.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUsers')}</p>
+        ) : (
+          <div className="space-y-2 max-h-[420px] overflow-y-auto">
+            {filteredUsers.map((u) => (
+              <div key={u.user_id} className="flex items-center justify-between gap-3 rounded-lg border p-3 flex-wrap">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {u.profile_image ? (
+                    <img src={u.profile_image} alt="" className="h-9 w-9 rounded-full object-cover" />
+                  ) : (
+                    <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-sm font-semibold">
+                      {u.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{u.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {u.is_super && (
+                    <Badge className="gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                      <Crown className="h-3 w-3" />
+                      {t('admin.superAdmin')}
+                    </Badge>
+                  )}
+                  {u.is_admin && !u.is_super && (
+                    <Badge variant="secondary" className="gap-1">
+                      <ShieldCheck className="h-3 w-3" />
+                      {t('admin.adminBadge')}
+                    </Badge>
+                  )}
+                  {!u.is_admin ? (
+                    <Button size="sm" onClick={() => promoteToAdmin(u)}>
+                      <ShieldCheck className="me-1 h-4 w-4" />
+                      {t('admin.makeAdmin')}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={u.is_super || u.user_id === user?.id}
+                      onClick={() => removeAdmin(u)}
+                    >
+                      <ShieldOff className="me-1 h-4 w-4" />
+                      {t('admin.removeAdmin')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       <Card className="p-6 mb-6">
         <h2 className="font-display text-lg font-semibold mb-4">{t('admin.itemsToReview')}</h2>
