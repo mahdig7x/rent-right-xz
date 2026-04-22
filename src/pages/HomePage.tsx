@@ -195,22 +195,23 @@ export default function HomePage() {
             <p className="mt-3 text-muted-foreground">{t('home.categorySubtitle')}</p>
           </motion.div>
 
-          {/* Mobile: vertical scroll list */}
-          <div className="sm:hidden max-h-[60vh] overflow-y-auto pe-1 -me-1 space-y-3 snap-y snap-mandatory">
-            {CATEGORIES.map(cat => {
-              const Icon = CATEGORY_ICONS[cat] || Package;
-              return (
-                <Link key={cat} to={`/browse?category=${encodeURIComponent(cat)}`} className="block snap-start">
-                  <Card className="group flex items-center gap-4 p-4 border-2 border-transparent hover:border-primary/30 hover:shadow-card-hover transition-all duration-300 active:scale-[0.99]">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <span className="font-display text-base font-semibold leading-tight flex-1">{t(`cat.${cat}`)}</span>
-                    <ArrowRight className={`h-5 w-5 text-muted-foreground shrink-0 ${isRtl ? 'rotate-180' : ''}`} />
-                  </Card>
-                </Link>
-              );
-            })}
+          {/* Mobile: horizontal scroll list */}
+          <div className="sm:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+            <div className="flex gap-3 pb-2 w-max">
+              {CATEGORIES.map(cat => {
+                const Icon = CATEGORY_ICONS[cat] || Package;
+                return (
+                  <Link key={cat} to={`/browse?category=${encodeURIComponent(cat)}`} className="snap-start shrink-0">
+                    <Card className="group flex flex-col items-center justify-center gap-2 p-3 w-20 h-24 border-2 border-transparent hover:border-primary/30 transition-all duration-300 active:scale-95">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                        <Icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="font-display text-[11px] font-semibold leading-tight text-center line-clamp-2">{t(`cat.${cat}`)}</span>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
           {/* Tablet/Desktop: equal-height grid */}
