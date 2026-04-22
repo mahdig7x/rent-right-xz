@@ -723,6 +723,7 @@ export default function ItemDetailsPage() {
                       </AnimatePresence>
                     </DialogContent>
                   </Dialog>
+                  )}
 
                   {/* Quick Info */}
                   <div className="space-y-3 pt-2">
