@@ -171,9 +171,53 @@ export default function AdminPage() {
   const deleteReport = async (report: any) => {
     const { error } = await supabase.from('reports').delete().eq('id', report.id);
     if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
-    setReports(prev => prev.filter(r => r.id !== report.id));
-    toast({ title: t('admin.report_deleted') });
   };
+
+  const openUserItems = async (u: UserRow) => {
+    setItemsUser(u);
+    setItemsLoading(true);
+    const { data } = await supabase
+      .from('items')
+      .select('id, title, category, price_per_day, status, moderation_status, images, owner_id')
+      .eq('owner_id', u.user_id)
+      .order('created_at', { ascending: false });
+    setUserItems(data || []);
+    setItemsLoading(false);
+  };
+
+  const refreshUserItems = async (ownerId: string) => {
+    const { data } = await supabase
+      .from('items')
+      .select('id, title, category, price_per_day, status, moderation_status, images, owner_id')
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false });
+    setUserItems(data || []);
+  };
+
+  const suspendItem = async (item: any) => {
+    const { error } = await supabase.from('items').update({ moderation_status: 'suspended' }).eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_suspended', item.id, item.title);
+    toast({ title: t('admin.item_suspended') });
+    if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
+  const reactivateItem = async (item: any) => {
+    const { error } = await supabase.from('items').update({ moderation_status: 'approved' }).eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_approved', item.id, item.title);
+    toast({ title: t('admin.item_reactivated') });
+    if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
+  const removeItem = async (item: any) => {
+    const { error } = await supabase.from('items').delete().eq('id', item.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_suspended', item.id, item.title, 'Item deleted');
+    toast({ title: t('admin.item_deleted') });
+    if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
 
 
   const statCards = [
