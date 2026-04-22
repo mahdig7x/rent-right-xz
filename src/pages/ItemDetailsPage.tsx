@@ -475,6 +475,7 @@ export default function ItemDetailsPage() {
                         <CheckCircle2 className="h-3.5 w-3.5 text-primary" />{t('details.verifiedMember')}
                       </p>
                     </div>
+                    {user?.id !== item.owner_id && (
                     <Dialog open={messageOpen} onOpenChange={setMessageOpen}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="gap-1.5 shrink-0">
@@ -494,6 +495,7 @@ export default function ItemDetailsPage() {
                         <Button onClick={handleMessage} className="w-full">{t('details.sendMessage')}</Button>
                       </DialogContent>
                     </Dialog>
+                    )}
                   </div>
                 </Card>
               </motion.div>
