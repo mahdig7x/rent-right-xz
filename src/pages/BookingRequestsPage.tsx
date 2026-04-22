@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 import { Check, X, Loader2, MessageSquare, PackageCheck, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BookingTracker from '@/components/BookingTracker';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 
 export default function BookingRequestsPage() {
   const { t } = useI18n();
@@ -92,7 +93,7 @@ export default function BookingRequestsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{r.items?.title}</p>
                   <p className="text-xs text-muted-foreground">{r.start_date} → {r.end_date}</p>
-                  <p className="text-xs font-medium text-primary mt-0.5">${r.total_price}</p>
+                  <p className="text-xs font-medium text-primary mt-0.5 inline-flex items-center gap-1">{r.total_price}<SaudiRiyal className="h-3 w-3" /></p>
                   <p className="text-xs text-muted-foreground mt-0.5">{t('bookingRequests.renter')} {r.renter?.name}</p>
                 </div>
               </div>

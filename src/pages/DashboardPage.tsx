@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Package, ShoppingBag, ClipboardList, MessageSquare, Plus, ArrowRight } from 'lucide-react';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 
@@ -113,7 +114,7 @@ export default function DashboardPage() {
                   <img src={item.images[0]} alt={item.title} className="h-12 w-12 rounded-lg object-cover" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">${item.price_per_day}{t('item.perDay')}</p>
+                    <p className="text-xs text-muted-foreground inline-flex items-center gap-1">{item.price_per_day}<SaudiRiyal className="h-3 w-3" />{t('item.perDay')}</p>
                   </div>
                   <Badge variant={item.status === 'available' ? 'default' : 'secondary'}>{item.status === 'available' ? t('item.available') : t('item.booked')}</Badge>
                 </Link>

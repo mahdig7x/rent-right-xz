@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin } from 'lucide-react';
 import { ListingItem } from '@/contexts/ListingsContext';
 import { useI18n } from '@/contexts/I18nContext';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 
 interface Props {
   item: ListingItem;
@@ -34,7 +35,10 @@ export default function ItemCard({ item }: Props) {
             <span className="truncate">{item.location}</span>
           </div>
           <div className="mt-auto pt-3 flex items-baseline gap-1">
-            <span className="font-display text-lg font-bold text-primary">${item.price_per_day}</span>
+            <span className="font-display text-lg font-bold text-primary inline-flex items-baseline gap-1">
+              {item.price_per_day}
+              <SaudiRiyal className="h-[0.85em] w-[0.85em] translate-y-[1px]" />
+            </span>
             <span className="text-xs text-muted-foreground">{t('item.perDay')}</span>
           </div>
         </div>

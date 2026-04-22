@@ -6,7 +6,8 @@ import { useI18n } from '@/contexts/I18nContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, MessageSquare, PackageCheck, Calendar, DollarSign } from 'lucide-react';
+import { ArrowLeft, MessageSquare, PackageCheck, Calendar } from 'lucide-react';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 import BookingTracker from '@/components/BookingTracker';
 
 export default function BookingDetailsPage() {
@@ -83,7 +84,7 @@ export default function BookingDetailsPage() {
             <p className="text-sm text-muted-foreground mt-1">{booking.items?.location}</p>
             <div className="flex flex-wrap gap-3 mt-3 text-sm">
               <span className="inline-flex items-center gap-1.5 text-muted-foreground"><Calendar className="h-4 w-4" />{booking.start_date} → {booking.end_date}</span>
-              <span className="inline-flex items-center gap-1.5 font-semibold text-primary"><DollarSign className="h-4 w-4" />{booking.total_price}</span>
+              <span className="inline-flex items-center gap-1.5 font-semibold text-primary">{booking.total_price}<SaudiRiyal className="h-4 w-4" /></span>
             </div>
           </div>
         </div>

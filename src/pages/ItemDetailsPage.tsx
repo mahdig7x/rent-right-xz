@@ -21,6 +21,7 @@ import {
   Clock, Package, Info, CreditCard, ArrowLeft, ArrowRight,
   ZoomIn, X, Loader2, PartyPopper, Eye
 } from 'lucide-react';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 import { toast } from '@/hooks/use-toast';
 import { differenceInDays, format, addDays } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
@@ -110,7 +111,7 @@ function BookingSuccess({ item, days, total, insurance, onClose, t }: {
           <img src={item.images[0]} alt="" className="h-14 w-14 rounded-xl object-cover" />
           <div className="flex-1">
             <p className="font-semibold text-sm">{item.title}</p>
-            <p className="text-xs text-muted-foreground">{days} {t('details.forDays')} • ${total + insurance}</p>
+            <p className="text-xs text-muted-foreground inline-flex items-center gap-1 flex-wrap">{days} {t('details.forDays')} • {total + insurance}<SaudiRiyal className="h-3 w-3" /></p>
           </div>
           <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
         </div>
@@ -404,7 +405,7 @@ export default function ItemDetailsPage() {
                     { label: t('details.condition'), value: conditionLabel, icon: Info },
                     { label: t('details.category'), value: t(`cat.${item.category}`), icon: Package },
                     { label: t('details.location'), value: item.location, icon: MapPin },
-                    { label: t('details.pricePerDay'), value: `$${item.price_per_day}`, icon: CreditCard },
+                    { label: t('details.pricePerDay'), value: <span className="inline-flex items-center gap-1">{item.price_per_day}<SaudiRiyal className="h-3 w-3" /></span>, icon: CreditCard },
                     { label: t('details.insurance'), value: '15%', icon: Shield },
                     { label: t('details.status'), value: statusLabel, icon: CheckCircle2 },
                   ].map((detail, i) => (
@@ -488,7 +489,7 @@ export default function ItemDetailsPage() {
                           <img src={item.images[0]} alt="" className="h-12 w-12 rounded-lg object-cover" />
                           <div>
                             <p className="text-sm font-semibold">{item.title}</p>
-                            <p className="text-xs text-muted-foreground">${item.price_per_day} {t('item.perDay')}</p>
+                            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">{item.price_per_day}<SaudiRiyal className="h-3 w-3" /> {t('item.perDay')}</p>
                           </div>
                         </div>
                         <Textarea placeholder={t('details.writeMessage')} value={message} onChange={e => setMessage(e.target.value)} rows={4} className="resize-none" />
@@ -560,7 +561,7 @@ export default function ItemDetailsPage() {
                   {/* Price Header */}
                   <div className="flex items-end justify-between">
                     <div>
-                      <span className="font-display text-3xl md:text-4xl font-extrabold text-primary">${item.price_per_day}</span>
+                      <span className="font-display text-3xl md:text-4xl font-extrabold text-primary inline-flex items-baseline gap-1.5">{item.price_per_day}<SaudiRiyal className="h-[0.7em] w-[0.7em] translate-y-[2px]" /></span>
                       <span className="text-muted-foreground ms-1">/ {t('details.day')}</span>
                     </div>
                     {avgRating && (
@@ -646,19 +647,19 @@ export default function ItemDetailsPage() {
                       >
                         <div className="rounded-xl bg-muted/50 p-4 space-y-2.5">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">${item.price_per_day} × {days} {t('details.days')}</span>
-                            <span className="font-medium">${total}</span>
+                            <span className="text-muted-foreground inline-flex items-center gap-1">{item.price_per_day}<SaudiRiyal className="h-3 w-3" /> × {days} {t('details.days')}</span>
+                            <span className="font-medium inline-flex items-center gap-1">{total}<SaudiRiyal className="h-3 w-3" /></span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground flex items-center gap-1.5">
                               <Shield className="h-3.5 w-3.5 text-primary" />{t('details.insurance')}
                             </span>
-                            <span className="font-medium">${insurance}</span>
+                            <span className="font-medium inline-flex items-center gap-1">{insurance}<SaudiRiyal className="h-3 w-3" /></span>
                           </div>
                           <Separator />
                           <div className="flex justify-between font-display font-bold text-base">
                             <span>{t('details.total')}</span>
-                            <span className="text-primary">${total + insurance}</span>
+                            <span className="text-primary inline-flex items-center gap-1">{total + insurance}<SaudiRiyal className="h-3.5 w-3.5" /></span>
                           </div>
                         </div>
                       </motion.div>
@@ -710,10 +711,10 @@ export default function ItemDetailsPage() {
                                 </div>
                               </div>
                               <div className="rounded-xl border p-4 space-y-2 text-sm">
-                                <div className="flex justify-between"><span className="text-muted-foreground">{t('details.rental')} ({days} {t('details.days')})</span><span className="font-medium">${total}</span></div>
-                                <div className="flex justify-between"><span className="text-muted-foreground">{t('details.insurance')}</span><span className="font-medium">${insurance}</span></div>
+                                <div className="flex justify-between"><span className="text-muted-foreground">{t('details.rental')} ({days} {t('details.days')})</span><span className="font-medium inline-flex items-center gap-1">{total}<SaudiRiyal className="h-3 w-3" /></span></div>
+                                <div className="flex justify-between"><span className="text-muted-foreground">{t('details.insurance')}</span><span className="font-medium inline-flex items-center gap-1">{insurance}<SaudiRiyal className="h-3 w-3" /></span></div>
                                 <Separator />
-                                <div className="flex justify-between font-display font-bold text-base"><span>{t('details.total')}</span><span className="text-primary">${total + insurance}</span></div>
+                                <div className="flex justify-between font-display font-bold text-base"><span>{t('details.total')}</span><span className="text-primary inline-flex items-center gap-1">{total + insurance}<SaudiRiyal className="h-3.5 w-3.5" /></span></div>
                               </div>
                               <PaymentForm amount={total + insurance} onSuccess={handleBook} loading={bookingState === 'processing'} />
                               <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
