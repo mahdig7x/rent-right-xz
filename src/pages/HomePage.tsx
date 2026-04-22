@@ -347,14 +347,14 @@ export default function HomePage() {
               <h2 className="font-display text-3xl md:text-4xl font-bold">{t('home.trustedSecure')}</h2>
               <p className="mt-3 text-muted-foreground">{t('home.trustSubtitle')}</p>
             </motion.div>
-            <div className="grid gap-6 sm:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-3 auto-rows-fr items-stretch">
               {[
                 { icon: Shield, title: t('home.insurance'), desc: t('home.insuranceDesc'), color: 'bg-primary/10' },
                 { icon: Users, title: t('home.verified'), desc: t('home.verifiedDesc'), color: 'bg-info/10' },
                 { icon: Lock, title: t('home.securePay'), desc: t('home.securePayDesc'), color: 'bg-warning/10' },
               ].map((item, i) => (
-                <motion.div key={i} variants={fadeUp}>
-                  <Card className="p-8 text-center border-2 border-transparent hover:border-primary/20 transition-all group">
+                <motion.div key={i} variants={fadeUp} className="h-full flex">
+                  <Card className="p-8 text-center w-full h-full flex flex-col border-2 border-transparent hover:border-primary/20 transition-all group">
                     <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl ${item.color} group-hover:scale-110 transition-transform`}>
                       <item.icon className="h-8 w-8 text-primary" />
                     </div>
