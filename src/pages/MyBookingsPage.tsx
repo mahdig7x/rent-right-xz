@@ -9,6 +9,7 @@ import ReviewDialog from '@/components/ReviewDialog';
 import BookingTracker from '@/components/BookingTracker';
 import { Link } from 'react-router-dom';
 import { MessageSquare, PackageCheck, Eye } from 'lucide-react';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 
 export default function MyBookingsPage() {
   const { t } = useI18n();
@@ -72,7 +73,7 @@ export default function MyBookingsPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{b.items?.title}</p>
                   <p className="text-xs text-muted-foreground">{b.start_date} → {b.end_date}</p>
-                  <p className="text-xs font-medium text-primary mt-0.5">${b.total_price}</p>
+                  <p className="text-xs font-medium text-primary mt-0.5 inline-flex items-baseline gap-1">{b.total_price}<SaudiRiyal className="h-[0.85em] w-[0.85em] translate-y-[1px]" /></p>
                 </div>
               </div>
 

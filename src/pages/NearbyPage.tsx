@@ -24,6 +24,8 @@ const defaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = defaultIcon;
 
+const RIYAL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1124.14 1256.39" width="0.85em" height="0.85em" fill="currentColor" style="display:inline-block;vertical-align:baseline;margin-inline-start:2px"><path d="M699.62,1113.02h0c-20.06,44.48-33.32,92.75-38.4,143.37l424.51-90.24c20.06-44.47,33.31-92.75,38.4-143.37l-424.51,90.24Z"/><path d="M1085.73,895.8c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.33v-135.2l292.27-62.11c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.27V66.13c-50.67,28.45-95.67,66.32-132.25,110.99v403.35l-132.25,28.11V0c-50.67,28.44-95.67,66.32-132.25,110.99v525.69L0,793.7c20.06,44.47,33.31,92.75,38.4,143.37l369.31-78.53v176.25c0,87.27-11.69,172.78-33.119,253.6,225.45-56.42,392.825-256.36,392.825-489.6v-18.66l318.314-67.71Z"/></svg>`;
+
 const GEO_CACHE_KEY = 'nearby_geo_cache_v1';
 
 const loadGeoCache = (): Record<string, [number, number]> => {
@@ -131,7 +133,7 @@ function buildPopupContent({
   meta.style.color = '#6b7280';
 
   const price = document.createElement('p');
-  price.textContent = `$${item.price_per_day}/${dayLabel}`;
+  price.innerHTML = `${item.price_per_day}${RIYAL_SVG}/${dayLabel}`;
   price.style.margin = '0';
   price.style.fontSize = '14px';
   price.style.fontWeight = '700';
@@ -333,7 +335,7 @@ export default function NearbyPage() {
         <div class="nearby-pin ${isSelected ? 'is-selected' : ''}" style="--pin-color:${primaryColor}">
           <div class="nearby-pin__bubble">
             <img src="${img}" alt="" />
-            <span class="nearby-pin__price">$${item.price_per_day}</span>
+            <span class="nearby-pin__price">${item.price_per_day}${RIYAL_SVG}</span>
           </div>
           <div class="nearby-pin__tail"></div>
         </div>
@@ -466,7 +468,7 @@ export default function NearbyPage() {
                     <p className="text-sm font-semibold truncate">{item.title}</p>
                     <p className="text-xs text-muted-foreground truncate">{item.location}</p>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs text-primary font-bold">${item.price_per_day}/{t('details.day')}</span>
+                      <span className="text-xs text-primary font-bold inline-flex items-baseline gap-1">{item.price_per_day}<SaudiRiyal className="h-[0.85em] w-[0.85em] translate-y-[1px]" />/{t('details.day')}</span>
                       <Badge variant="secondary" className="text-[10px]">
                         {distance.toFixed(1)} km
                       </Badge>

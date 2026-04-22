@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 
 export default function MyListingsPage() {
   const { t } = useI18n();
@@ -39,7 +40,7 @@ export default function MyListingsPage() {
               <div className="flex-1 min-w-0">
                 <Link to={`/items/${item.id}`} className="font-semibold text-sm hover:underline">{item.title}</Link>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-muted-foreground">${item.price_per_day}{t('item.perDay')}</span>
+                  <span className="text-xs text-muted-foreground inline-flex items-baseline gap-1">{item.price_per_day}<SaudiRiyal className="h-[0.85em] w-[0.85em] translate-y-[1px]" />{t('item.perDay')}</span>
                   <Badge variant={item.status === 'available' ? 'default' : 'secondary'} className="text-xs">{item.status === 'available' ? t('item.available') : t('item.booked')}</Badge>
                 </div>
               </div>
