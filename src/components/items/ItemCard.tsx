@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin } from 'lucide-react';
 import { ListingItem } from '@/contexts/ListingsContext';
 import { useI18n } from '@/contexts/I18nContext';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 
 interface Props {
   item: ListingItem;

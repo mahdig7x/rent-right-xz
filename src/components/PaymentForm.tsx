@@ -101,7 +101,7 @@ export default function PaymentForm({ amount, onSuccess, loading: externalLoadin
         {isLoading ? (
           <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t('pay.processing')}</>
         ) : (
-          <><Lock className="me-2 h-4 w-4" />{t('pay.payNow')} ${amount}</>
+          <><Lock className="me-2 h-4 w-4" />{t('pay.payNow')} <span className="inline-flex items-center gap-1">{amount}<SaudiRiyal className="h-3.5 w-3.5" /></span></>
         )}
       </Button>
       <p className="text-xs text-center text-muted-foreground">{t('pay.testHint')}</p>
