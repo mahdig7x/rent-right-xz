@@ -459,7 +459,7 @@ export default function NearbyPage() {
           </div>
         </Card>
 
-        <div className="lg:col-span-2 lg:order-2 order-1 rounded-xl overflow-hidden border bg-muted h-[55vh] lg:h-full min-h-[320px]">
+        <div className="lg:col-span-2 lg:order-2 order-1 rounded-xl overflow-hidden border bg-muted h-[55vh] lg:h-full min-h-[320px] relative z-0 [&_.leaflet-pane]:!z-0 [&_.leaflet-top]:!z-[1] [&_.leaflet-bottom]:!z-[1] [&_.leaflet-control]:!z-[1]">
           <div ref={mapElementRef} className="h-full w-full" />
         </div>
       </div>
