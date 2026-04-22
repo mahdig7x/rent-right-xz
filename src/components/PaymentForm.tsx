@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Lock, Loader2 } from 'lucide-react';
+import { SaudiRiyal } from '@/components/SaudiRiyal';
 import { useI18n } from '@/contexts/I18nContext';
 
 interface PaymentFormProps {
