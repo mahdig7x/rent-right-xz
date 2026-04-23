@@ -338,7 +338,7 @@ export default function NearbyPage() {
         <div class="nearby-pin ${isSelected ? 'is-selected' : ''}" style="--pin-color:${primaryColor}">
           <div class="nearby-pin__bubble">
             <img src="${img}" alt="" />
-            <span class="nearby-pin__price">${item.price_per_day}${RIYAL_SVG}</span>
+            <span class="nearby-pin__price">${item.price_per_day}${riyalMaskHTML('#ffffff', 0.85)}</span>
           </div>
           <div class="nearby-pin__tail"></div>
         </div>
