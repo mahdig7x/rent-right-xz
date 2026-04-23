@@ -1,48 +1,50 @@
 
 
-## استبدال رمز الدولار ($) برمز الريال السعودي الجديد
+## إصلاح وصول رمز تأكيد البريد عند التسجيل
 
-### المواقع المتبقية التي لا تزال تستخدم `$`
+### التشخيص
+- **الكود سليم**: `RegisterPage.tsx` و `LoginPage.tsx` و `AuthContext.tsx` يستخدمان `supabase.auth.signUp` و `signInWithPassword` و `resend` بشكل صحيح.
+- **المشكلة الحقيقية**: لا يوجد نطاق بريد مُكوَّن للمشروع (`No email domains found`). نتيجة لذلك:
+  - رسائل التأكيد تُرسل من نطاق Lovable الافتراضي.
+  - تذهب غالباً لمجلد **Spam/Junk** أو يحجبها مزود البريد (Gmail / Outlook).
+  - لا يوجد قوالب مخصصة بالعربية بهوية "Rent Right".
 
-| الملف | السطر | السياق |
-|------|------|--------|
-| `src/pages/MyListingsPage.tsx` | 42 | سعر اليوم في بطاقة الإعلان |
-| `src/pages/MyBookingsPage.tsx` | 75 | إجمالي سعر الحجز |
-| `src/pages/NearbyPage.tsx` | 134 | سعر داخل popup الخريطة (DOM يدوي) |
-| `src/pages/NearbyPage.tsx` | 336 | سعر داخل دبوس الخريطة (HTML نصّي) |
-| `src/pages/NearbyPage.tsx` | 469 | سعر في القائمة الجانبية |
+### خطة الإصلاح
 
-### خطة التنفيذ
+**1. إعداد نطاق بريد مخصص** (الخطوة الأهم لحل وصول الرسائل)
+- المستخدم يفتح حوار إعداد النطاق ويُدخل نطاقه (مثل `rent-right.com`).
+- النظام ينشئ نطاقاً فرعياً (مثل `notify.rent-right.com`) ويبدأ التحقق من DNS.
 
-**1. ملفات React (JSX) — استخدام مكوّن `<SaudiRiyal />`**
-- `MyListingsPage.tsx` السطر 42: استبدال `${item.price_per_day}` بـ:
-  ```tsx
-  <span className="inline-flex items-baseline gap-1">{item.price_per_day}<SaudiRiyal className="h-3 w-3" /></span>{t('item.perDay')}
-  ```
-- `MyBookingsPage.tsx` السطر 75: نفس النمط مع `b.total_price`.
-- `NearbyPage.tsx` السطر 469: نفس النمط مع `item.price_per_day`.
+**2. تجهيز البنية التحتية للبريد (تلقائياً)**
+- تهيئة طوابير الإرسال وإعدادات الإرسال الموثوق.
 
-**2. عناصر DOM/HTML يدوية في `NearbyPage.tsx`**
-الدبابيس و popup مبنية بـ `document.createElement` و innerHTML نصّي، لذا لا يمكن استخدام مكوّن React مباشرة. الحل: تضمين SVG الريال inline كسلسلة نصّية ثابتة.
+**3. قوالب بريد التحقق المخصصة بالعربية**
+- إنشاء قوالب React Email لجميع رسائل المصادقة (تأكيد التسجيل، إعادة تعيين كلمة المرور، رابط سحري، تغيير البريد).
+- تطبيق هوية Rent Right: الألوان من `index.css`، الخط، شعار المنصة إن وُجد.
+- صياغة عربية واضحة تطابق نبرة المنصة.
+- نشر `auth-email-hook` Edge Function لتفعيل القوالب.
 
-- إضافة ثابت في أعلى الملف:
-  ```ts
-  const RIYAL_SVG = `<svg viewBox="0 0 1124.14 1256.39" width="0.85em" height="0.85em" fill="currentColor" style="display:inline-block;vertical-align:baseline;margin-inline-start:2px"><path d="..."/><path d="..."/></svg>`;
-  ```
-  (نسخ الـ paths من `src/components/SaudiRiyal.tsx`)
-- السطر 134 (popup):
-  ```ts
-  price.innerHTML = `${item.price_per_day}${RIYAL_SVG}/${dayLabel}`;
-  ```
-- السطر 336 (pin bubble):
-  ```ts
-  <span class="nearby-pin__price">${item.price_per_day}${RIYAL_SVG}</span>
-  ```
+**4. تحسينات اختيارية موصى بها**
+- تفعيل **HIBP** (فحص كلمات المرور المسرّبة) عبر `configure_auth` لزيادة الأمان دون تأثير على المستخدم.
 
-**3. استيراد المكوّن**
-إضافة `import { SaudiRiyal } from '@/components/SaudiRiyal';` في الملفات الثلاثة (إن لم يكن موجوداً).
+### ما لا يحتاج تغيير
+- منطق التسجيل/الدخول في `AuthContext.tsx` — يعمل بشكل صحيح.
+- صفحات `RegisterPage.tsx` و `LoginPage.tsx` — تتعامل مع حالة "البريد غير مؤكد" بشكل ممتاز مع زر إعادة الإرسال.
+- Google OAuth — يعمل ولا يحتاج تأكيد بريد.
 
-### ملاحظات
-- لن يتم تغيير أي ملفات أخرى — تم تأكيد أن باقي صفحات السعر (`ItemCard`, `ItemDetailsPage`, `PaymentForm`, `BookingDetailsPage`) تستخدم `<SaudiRiyal />` بالفعل.
-- بدون أي تغييرات في قاعدة البيانات أو الترجمات.
+### بعد التنفيذ
+- رسائل التأكيد ستصل من بريد بهوية نطاقك (مثلاً `noreply@rent-right.com`).
+- تحسّن كبير في معدل التسليم (لا تذهب للـ Spam).
+- التفعيل التلقائي لإرسال الرسائل بعد التحقق من DNS (قد يستغرق حتى 72 ساعة).
+- يمكن متابعة الحالة من **Cloud → Emails**.
+
+### ملاحظة مهمة
+إعداد النطاق يتطلب منك إضافة سجلات NS عند مزود النطاق (مثل GoDaddy / Namecheap). الحوار سيعرض السجلات المطلوبة بوضوح.
+
+### الإجراء المطلوب منك الآن
+الضغط على زر إعداد نطاق البريد لبدء العملية:
+
+<lov-actions>
+<lov-open-email-setup>إعداد نطاق البريد</lov-open-email-setup>
+</lov-actions>
 
