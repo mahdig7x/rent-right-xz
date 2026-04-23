@@ -136,7 +136,7 @@ function buildPopupContent({
   meta.style.color = '#6b7280';
 
   const price = document.createElement('p');
-  price.innerHTML = `${item.price_per_day}${RIYAL_SVG}/${dayLabel}`;
+  price.innerHTML = `${item.price_per_day}${riyalMaskHTML(primaryColor, 0.9)}/${dayLabel}`;
   price.style.margin = '0';
   price.style.fontSize = '14px';
   price.style.fontWeight = '700';
