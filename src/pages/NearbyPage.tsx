@@ -26,7 +26,8 @@ const defaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = defaultIcon;
 
-const RIYAL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1124.14 1256.39" width="0.85em" height="0.85em" fill="currentColor" style="display:inline-block;vertical-align:baseline;margin-inline-start:2px"><path d="M699.62,1113.02h0c-20.06,44.48-33.32,92.75-38.4,143.37l424.51-90.24c20.06-44.47,33.31-92.75,38.4-143.37l-424.51,90.24Z"/><path d="M1085.73,895.8c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.33v-135.2l292.27-62.11c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.27V66.13c-50.67,28.45-95.67,66.32-132.25,110.99v403.35l-132.25,28.11V0c-50.67,28.44-95.67,66.32-132.25,110.99v525.69L0,793.7c20.06,44.47,33.31,92.75,38.4,143.37l369.31-78.53v176.25c0,87.27-11.69,172.78-33.119,253.6,225.45-56.42,392.825-256.36,392.825-489.6v-18.66l318.314-67.71Z"/></svg>`;
+const riyalMaskHTML = (color: string, sizeEm = 0.9) =>
+  `<span style="display:inline-block;width:${sizeEm}em;height:${sizeEm}em;background-color:${color};-webkit-mask:url(${riyalImg}) center/contain no-repeat;mask:url(${riyalImg}) center/contain no-repeat;vertical-align:-0.125em;margin-inline-start:2px"></span>`;
 
 const GEO_CACHE_KEY = 'nearby_geo_cache_v1';
 
