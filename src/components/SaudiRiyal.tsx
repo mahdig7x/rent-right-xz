@@ -5,32 +5,35 @@ interface SaudiRiyalProps extends React.SVGProps<SVGSVGElement> {
 }
 
 /**
- * Official Saudi Riyal symbol (introduced by SAMA, 2025).
- * Uses currentColor so it inherits text color in any context.
- * Source: Saudi Central Bank (SAMA) official glyph.
+ * Official new Saudi Riyal symbol (issued by SAMA, February 2025).
+ * Uses `currentColor` so it inherits text color in any context.
+ *
+ * The path data is the official glyph published by the Saudi Central Bank.
+ * For better legibility at small sizes, render at >= 0.9em alongside text
+ * and apply a small downward translate so it sits on the text baseline.
  */
-export const SaudiRiyal: React.FC<SaudiRiyalProps> = ({ size, className, ...props }) => (
+export const SaudiRiyal: React.FC<SaudiRiyalProps> = ({
+  size,
+  className,
+  ...props
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 1256 1256"
+    viewBox="0 0 1124.14 1256.39"
     width={size ?? '1em'}
     height={size ?? '1em'}
     fill="currentColor"
     aria-label="Saudi Riyal"
     role="img"
     className={className}
+    style={{
+      shapeRendering: 'geometricPrecision',
+      ...(props.style || {}),
+    }}
     {...props}
   >
-    {/* Top-right horizontal stroke */}
-    <path d="M1110 360 L1110 500 L640 600 L640 460 Z" />
-    {/* Middle horizontal stroke */}
-    <path d="M1110 580 L1110 720 L640 820 L640 680 Z" />
-    {/* Left vertical stem (long) */}
-    <path d="M380 120 L520 90 L520 900 Q520 1050 380 1110 Q420 980 420 870 L420 150 Z" />
-    {/* Right vertical stem (short) */}
-    <path d="M640 280 L780 250 L780 760 L640 790 Z" />
-    {/* Bottom curved tail connecting left stem */}
-    <path d="M150 880 L420 820 L420 960 L180 1010 Z" />
+    <path d="M699.62,1113.02h0c-20.06,44.48-33.32,92.75-38.4,143.37l424.51-90.24c20.06-44.47,33.31-92.75,38.4-143.37l-424.51,90.24Z" />
+    <path d="M1085.73,895.8c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.33v-135.2l292.27-62.11c20.06-44.47,33.32-92.75,38.4-143.37l-330.68,70.27V66.13c-50.67,28.45-95.67,66.32-132.25,110.99v403.35l-132.25,28.11V0c-50.67,28.44-95.67,66.32-132.25,110.99v525.69L0,793.7c20.06,44.47,33.31,92.75,38.4,143.37l369.31-78.53v176.25c0,87.27-11.69,172.78-33.119,253.6,225.45-56.42,392.825-256.36,392.825-489.6v-18.66l318.314-67.71Z" />
   </svg>
 );
 
