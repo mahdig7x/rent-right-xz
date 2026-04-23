@@ -12,6 +12,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Loader2, LocateFixed, Search } from 'lucide-react';
 import { SaudiRiyal } from '@/components/SaudiRiyal';
+import riyalImg from '@/assets/saudi-riyal.png';
 
 const defaultIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
