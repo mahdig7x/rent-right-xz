@@ -41,6 +41,8 @@ export default function AdminPage() {
   const [userSearch, setUserSearch] = useState('');
   const [itemsUser, setItemsUser] = useState<UserRow | null>(null);
   const [userItems, setUserItems] = useState<any[]>([]);
+  const [userBookings, setUserBookings] = useState<any[]>([]);
+  const [userReviews, setUserReviews] = useState<any[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
 
   useEffect(() => {
