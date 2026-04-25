@@ -210,7 +210,7 @@ export default function AIAssistant() {
           {/* Input */}
           <form
             onSubmit={(e) => { e.preventDefault(); send(); }}
-            className="border-t border-border p-3 flex items-center gap-2 bg-card"
+            className="border-t border-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center gap-2 bg-card"
           >
             <Input
               value={input}
