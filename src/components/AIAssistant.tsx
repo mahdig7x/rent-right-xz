@@ -107,7 +107,7 @@ export default function AIAssistant() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 end-6 z-40 group flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary/80 px-4 py-3 shadow-lg shadow-primary/30 ring-1 ring-primary/40 hover:shadow-xl hover:shadow-primary/40 transition-all hover:-translate-y-0.5"
+          className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] end-4 sm:bottom-6 sm:end-6 z-40 group flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary/80 px-4 py-3 shadow-lg shadow-primary/30 ring-1 ring-primary/40 hover:shadow-xl hover:shadow-primary/40 transition-all hover:-translate-y-0.5 active:scale-95"
           aria-label={t('ai.open')}
         >
           <Sparkles className="h-5 w-5 text-primary-foreground" />
@@ -115,9 +115,17 @@ export default function AIAssistant() {
         </button>
       )}
 
-      {/* Panel */}
+      {/* Panel — fullscreen on mobile, floating card on desktop */}
       {open && (
-        <div className="fixed bottom-6 end-6 z-50 w-[min(420px,calc(100vw-2rem))] h-[min(640px,calc(100vh-3rem))] flex flex-col rounded-2xl border border-border bg-card shadow-2xl shadow-primary/10 overflow-hidden">
+        <>
+          {/* Backdrop (mobile only) */}
+          <div
+            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm sm:hidden"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:end-6 z-50 sm:w-[420px] sm:h-[640px] sm:max-h-[calc(100vh-3rem)] flex flex-col bg-card sm:rounded-2xl sm:border sm:border-border shadow-2xl shadow-primary/10 overflow-hidden">
+
           <header className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-8 w-8 rounded-full bg-primary/15 flex items-center justify-center">
