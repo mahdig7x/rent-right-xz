@@ -61,6 +61,7 @@ const App = () => {
                     </Routes>
                   </main>
                   <Footer />
+                  <AIAssistant />
                 </div>
               </BrowserRouter>
             </NotificationsProvider>
