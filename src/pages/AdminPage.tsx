@@ -462,72 +462,159 @@ export default function AdminPage() {
       </Card>
 
       <Sheet open={!!itemsUser} onOpenChange={(o) => !o && setItemsUser(null)}>
-        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>{t('admin.userItems')} — {itemsUser?.name}</SheetTitle>
+            <SheetTitle>{t('admin.viewProfile')} — {itemsUser?.name}</SheetTitle>
           </SheetHeader>
-          <div className="mt-6 space-y-3">
-            {itemsLoading ? (
-              <p className="text-sm text-muted-foreground text-center py-6">{t('admin.loading')}</p>
-            ) : userItems.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUserItems')}</p>
-            ) : (
-              userItems.map((it) => {
-                const suspended = it.moderation_status === 'suspended';
-                return (
-                  <div key={it.id} className="rounded-lg border p-3 flex gap-3">
-                    {it.images?.[0] ? (
-                      <img src={it.images[0]} alt="" className="h-14 w-14 rounded object-cover" />
+
+          {itemsLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-10">{t('admin.loading')}</p>
+          ) : (
+            <Tabs defaultValue="items" className="mt-6">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="items"><Package className="me-1.5 h-4 w-4" />{t('admin.tabItems')} ({userItems.length})</TabsTrigger>
+                <TabsTrigger value="bookings"><Calendar className="me-1.5 h-4 w-4" />{t('admin.tabBookings')} ({userBookings.length})</TabsTrigger>
+                <TabsTrigger value="reviews"><Star className="me-1.5 h-4 w-4" />{t('admin.tabReviews')} ({userReviews.length})</TabsTrigger>
+              </TabsList>
+
+              {/* ITEMS */}
+              <TabsContent value="items" className="space-y-3 mt-4">
+                {userItems.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUserItems')}</p>
+                ) : userItems.map((it) => {
+                  const suspended = it.moderation_status === 'suspended';
+                  return (
+                    <div key={it.id} className="rounded-lg border p-3 flex gap-3">
+                      {it.images?.[0] ? (
+                        <img src={it.images[0]} alt="" className="h-14 w-14 rounded object-cover" />
+                      ) : (
+                        <div className="h-14 w-14 rounded bg-muted flex items-center justify-center">
+                          <Package className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold truncate">{it.title}</p>
+                        <p className="text-xs text-muted-foreground">{it.category} · {it.price_per_day}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <Badge variant={suspended ? 'destructive' : 'secondary'} className="text-xs">
+                            {it.moderation_status}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {suspended ? (
+                            <Button size="sm" variant="outline" onClick={() => reactivateItem(it)}>
+                              <RotateCcw className="me-1 h-3.5 w-3.5" />
+                              {t('admin.itemReactivate')}
+                            </Button>
+                          ) : (
+                            <Button size="sm" variant="secondary" onClick={() => suspendItem(it)}>
+                              <Ban className="me-1 h-3.5 w-3.5" />
+                              {t('admin.itemSuspend')}
+                            </Button>
+                          )}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button size="sm" variant="destructive">
+                                <Trash2 className="me-1 h-3.5 w-3.5" />
+                                {t('admin.itemDelete')}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>{t('admin.itemDelete')}</AlertDialogTitle>
+                                <AlertDialogDescription>{t('admin.itemDeleteConfirm')}</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => removeItem(it)}>{t('admin.itemDelete')}</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </TabsContent>
+
+              {/* BOOKINGS */}
+              <TabsContent value="bookings" className="space-y-3 mt-4">
+                {userBookings.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUserBookings')}</p>
+                ) : userBookings.map((b) => (
+                  <div key={b.id} className="rounded-lg border p-3 flex gap-3">
+                    {b.item_image ? (
+                      <img src={b.item_image} alt="" className="h-14 w-14 rounded object-cover" />
                     ) : (
                       <div className="h-14 w-14 rounded bg-muted flex items-center justify-center">
                         <Package className="h-5 w-5 text-muted-foreground" />
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold truncate">{it.title}</p>
-                      <p className="text-xs text-muted-foreground">{it.category} · {it.price_per_day}</p>
+                      <p className="text-sm font-semibold truncate">{b.item_title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(b.start_date).toLocaleDateString()} → {new Date(b.end_date).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {t('admin.bookingAs')} {b.role === 'renter' ? t('admin.asRenter') : t('admin.asLessor')} · {b.other_name}
+                      </p>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        <Badge variant={suspended ? 'destructive' : 'secondary'} className="text-xs">
-                          {it.moderation_status}
-                        </Badge>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {suspended ? (
-                          <Button size="sm" variant="outline" onClick={() => reactivateItem(it)}>
-                            <RotateCcw className="me-1 h-3.5 w-3.5" />
-                            {t('admin.itemReactivate')}
-                          </Button>
-                        ) : (
-                          <Button size="sm" variant="secondary" onClick={() => suspendItem(it)}>
-                            <Ban className="me-1 h-3.5 w-3.5" />
-                            {t('admin.itemSuspend')}
-                          </Button>
-                        )}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button size="sm" variant="destructive">
-                              <Trash2 className="me-1 h-3.5 w-3.5" />
-                              {t('admin.itemDelete')}
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>{t('admin.itemDelete')}</AlertDialogTitle>
-                              <AlertDialogDescription>{t('admin.itemDeleteConfirm')}</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => removeItem(it)}>{t('admin.itemDelete')}</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        <Badge variant="secondary" className="text-xs">{t(`bookingStatus.${b.status}`)}</Badge>
+                        <Badge variant="outline" className="text-xs">{b.total_price}</Badge>
                       </div>
                     </div>
                   </div>
-                );
-              })
-            )}
-          </div>
+                ))}
+              </TabsContent>
+
+              {/* REVIEWS */}
+              <TabsContent value="reviews" className="space-y-3 mt-4">
+                {userReviews.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">{t('admin.noUserReviews')}</p>
+                ) : userReviews.map((r) => (
+                  <div key={r.id} className="rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-1.5">
+                        {[1,2,3,4,5].map(n => (
+                          <Star key={n} className={`h-3.5 w-3.5 ${n <= r.rating ? 'text-warning fill-warning' : 'text-muted-foreground/30'}`} />
+                        ))}
+                      </div>
+                      {r.hidden && <Badge variant="destructive" className="text-xs gap-1"><EyeOff className="h-3 w-3" />{t('admin.hiddenBadge')}</Badge>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {t('admin.reviewBy')} <span className="font-medium text-foreground">{r.reviewer_name}</span>
+                      {' · '}{t('admin.reviewFor')} <span className="font-medium text-foreground">{r.reviewed_name}</span>
+                    </p>
+                    {r.comment && <p className="text-sm break-words mb-2">{r.comment}</p>}
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" variant={r.hidden ? 'outline' : 'secondary'} onClick={() => toggleReviewHidden(r)}>
+                        {r.hidden ? <Eye className="me-1 h-3.5 w-3.5" /> : <EyeOff className="me-1 h-3.5 w-3.5" />}
+                        {r.hidden ? t('admin.reviewShow') : t('admin.reviewHide')}
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="destructive">
+                            <Trash2 className="me-1 h-3.5 w-3.5" />
+                            {t('admin.reviewDelete')}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('admin.reviewDelete')}</AlertDialogTitle>
+                            <AlertDialogDescription>{t('admin.reviewDeleteConfirm')}</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('admin.reject')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteReview(r)}>{t('admin.reviewDelete')}</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
+            </Tabs>
+          )}
         </SheetContent>
       </Sheet>
     </div>
