@@ -180,6 +180,53 @@ export default function AdminPage() {
     if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
   };
 
+  const loadUserBookings = async (userId: string) => {
+    const { data: bookings } = await supabase
+      .from('bookings')
+      .select('*')
+      .or(`renter_id.eq.${userId},lessor_id.eq.${userId}`)
+      .order('created_at', { ascending: false });
+    if (!bookings || bookings.length === 0) { setUserBookings([]); return; }
+    const itemIds = [...new Set(bookings.map((b: any) => b.item_id))];
+    const otherIds = [...new Set(bookings.map((b: any) => b.renter_id === userId ? b.lessor_id : b.renter_id))];
+    const [itemsRes, profsRes] = await Promise.all([
+      supabase.from('items').select('id, title, images').in('id', itemIds),
+      (supabase as any).from('profiles_public').select('user_id, name').in('user_id', otherIds),
+    ]);
+    const itemsMap: Record<string, any> = {};
+    (itemsRes.data || []).forEach((it: any) => { itemsMap[it.id] = it; });
+    const profsMap: Record<string, string> = {};
+    (profsRes.data || []).forEach((p: any) => { profsMap[p.user_id] = p.name; });
+    setUserBookings(bookings.map((b: any) => ({
+      ...b,
+      item_title: itemsMap[b.item_id]?.title || '—',
+      item_image: itemsMap[b.item_id]?.images?.[0] || null,
+      other_name: profsMap[b.renter_id === userId ? b.lessor_id : b.renter_id] || '—',
+      role: b.renter_id === userId ? 'renter' : 'lessor',
+    })));
+  };
+
+  const loadUserReviews = async (userId: string) => {
+    const { data: reviews } = await supabase
+      .from('reviews')
+      .select('*')
+      .or(`reviewer_id.eq.${userId},reviewed_user_id.eq.${userId}`)
+      .order('created_at', { ascending: false });
+    if (!reviews || reviews.length === 0) { setUserReviews([]); return; }
+    const partyIds = [...new Set(reviews.flatMap((r: any) => [r.reviewer_id, r.reviewed_user_id]))];
+    const { data: profs } = await (supabase as any)
+      .from('profiles_public')
+      .select('user_id, name')
+      .in('user_id', partyIds);
+    const profsMap: Record<string, string> = {};
+    (profs || []).forEach((p: any) => { profsMap[p.user_id] = p.name; });
+    setUserReviews(reviews.map((r: any) => ({
+      ...r,
+      reviewer_name: profsMap[r.reviewer_id] || '—',
+      reviewed_name: profsMap[r.reviewed_user_id] || '—',
+    })));
+  };
+
   const openUserItems = async (u: UserRow) => {
     setItemsUser(u);
     setItemsLoading(true);
@@ -189,6 +236,7 @@ export default function AdminPage() {
       .eq('owner_id', u.user_id)
       .order('created_at', { ascending: false });
     setUserItems(data || []);
+    await Promise.all([loadUserBookings(u.user_id), loadUserReviews(u.user_id)]);
     setItemsLoading(false);
   };
 
@@ -223,6 +271,23 @@ export default function AdminPage() {
     await logAction('listing_suspended', item.id, item.title, 'Item deleted');
     toast({ title: t('admin.item_deleted') });
     if (itemsUser) refreshUserItems(itemsUser.user_id);
+  };
+
+  const toggleReviewHidden = async (review: any) => {
+    const newHidden = !review.hidden;
+    const { error } = await (supabase as any).from('reviews').update({ hidden: newHidden }).eq('id', review.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('listing_flagged', review.id, `Review ${newHidden ? 'hidden' : 'shown'}`);
+    toast({ title: t(newHidden ? 'admin.reviewHidden' : 'admin.reviewShown') });
+    if (itemsUser) loadUserReviews(itemsUser.user_id);
+  };
+
+  const deleteReview = async (review: any) => {
+    const { error } = await supabase.from('reviews').delete().eq('id', review.id);
+    if (error) { toast({ title: t('admin.failed'), description: error.message, variant: 'destructive' }); return; }
+    await logAction('report_resolved', review.id, 'Review deleted');
+    toast({ title: t('admin.review_deleted') });
+    if (itemsUser) loadUserReviews(itemsUser.user_id);
   };
 
 
