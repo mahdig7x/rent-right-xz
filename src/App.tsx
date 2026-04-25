@@ -19,6 +19,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import ReportPage from "@/pages/ReportPage";
 import AdminPage from "@/pages/AdminPage";
 import NotFound from "@/pages/NotFound";
+import AIAssistant from "@/components/AIAssistant";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { ChatProvider } from "@/contexts/ChatContext";
@@ -60,6 +61,7 @@ const App = () => {
                     </Routes>
                   </main>
                   <Footer />
+                  <AIAssistant />
                 </div>
               </BrowserRouter>
             </NotificationsProvider>
