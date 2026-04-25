@@ -328,6 +328,7 @@ export type Database = {
           booking_id: string
           comment: string | null
           created_at: string
+          hidden: boolean
           id: string
           rating: number
           reviewed_user_id: string
@@ -337,6 +338,7 @@ export type Database = {
           booking_id: string
           comment?: string | null
           created_at?: string
+          hidden?: boolean
           id?: string
           rating: number
           reviewed_user_id: string
@@ -346,6 +348,7 @@ export type Database = {
           booking_id?: string
           comment?: string | null
           created_at?: string
+          hidden?: boolean
           id?: string
           rating?: number
           reviewed_user_id?: string
