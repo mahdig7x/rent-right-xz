@@ -363,8 +363,8 @@ export default function AdminPage() {
                     </Badge>
                   )}
                   <Button size="sm" variant="outline" onClick={() => openUserItems(u)}>
-                    <Package className="me-1 h-4 w-4" />
-                    {t('admin.viewItems')}
+                    <UserCog className="me-1 h-4 w-4" />
+                    {t('admin.viewProfile')}
                   </Button>
                   {!u.is_admin ? (
                     <Button size="sm" onClick={() => promoteToAdmin(u)}>
