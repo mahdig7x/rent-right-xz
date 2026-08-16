@@ -66,7 +66,7 @@ This project was developed following Software Engineering principles and include
 
 The complete documentation can be found in:
 
-- Rent-Right-Software-Engineering-Report.pdf
+- SE_RentRight_Report.pdf
 
 ## System Architecture
 
